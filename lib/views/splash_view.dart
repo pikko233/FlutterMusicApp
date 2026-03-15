@@ -17,7 +17,7 @@ class _SplashViewState extends State<SplashView> {
   }
 
   Future<void> _jumpToMainView() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 2000));
     Get.offAllNamed('/main');
   }
 
