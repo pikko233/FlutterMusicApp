@@ -18,62 +18,59 @@ class _HomeViewState extends State<HomeView> {
       slivers: [
         SliverAppBar(
           pinned: true,
-          toolbarHeight: 100,
+          toolbarHeight: kToolbarHeight * 1.5,
           backgroundColor: AppColors.bgPrimary,
           flexibleSpace: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 问候语区域
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 55,
-                          height: 55,
-                          decoration: BoxDecoration(
-                            color: AppColors.accent4,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Align(
-                            child: Text(
-                              "Z",
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.accent4,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: Align(
+                        child: Text(
+                          "Z",
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        Column(
-                          children: [
-                            Text(
-                              "晚上好 👋",
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "你想听点什么？",
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "晚上好 👋",
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "你想听点什么？",
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
-                    IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
                   ],
                 ),
+                IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
               ],
             ),
           ),
@@ -83,31 +80,6 @@ class _HomeViewState extends State<HomeView> {
           sliver: SliverToBoxAdapter(
             child: Column(
               children: [
-                // // 搜索框
-                // GestureDetector(
-                //   onTap: widget.onSearchTap,
-                //   child: Container(
-                //     padding: const EdgeInsets.symmetric(horizontal: 20),
-                //     width: double.infinity,
-                //     height: 50,
-                //     decoration: BoxDecoration(
-                //       color: AppColors.bgCard,
-                //       borderRadius: BorderRadius.circular(25),
-                //     ),
-                //     child: Row(
-                //       crossAxisAlignment: CrossAxisAlignment.center,
-                //       children: [
-                //         Icon(Icons.search, color: AppColors.textHint),
-                //         const SizedBox(width: 30),
-                //         Text(
-                //           "搜索歌曲、艺术家、专辑……",
-                //           style: TextStyle(color: AppColors.textHint),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 20),
                 // 今日推荐
                 SectionTitle(title: "今日推荐", onPressed: () {}),
                 const SizedBox(height: 10),
