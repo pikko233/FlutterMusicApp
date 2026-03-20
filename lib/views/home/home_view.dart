@@ -20,6 +20,7 @@ class _HomeViewState extends State<HomeView> {
           pinned: true,
           toolbarHeight: kToolbarHeight * 1.5,
           backgroundColor: AppColors.bgPrimary,
+          scrolledUnderElevation: 0,
           flexibleSpace: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
             child: Row(
@@ -49,9 +50,10 @@ class _HomeViewState extends State<HomeView> {
                     const SizedBox(width: 20),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "晚上好 👋",
+                          "晚上好~",
                           style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 20,
