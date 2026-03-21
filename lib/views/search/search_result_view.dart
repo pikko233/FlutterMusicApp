@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/views/search/tabViews/search_playlist_list.dart';
+import 'package:flutter_music_app/widgets/mini_player.dart';
+import 'package:flutter_music_app/views/search/tabViews/search_album_list.dart';
+import 'package:flutter_music_app/views/search/tabViews/search_singer_list.dart';
 import 'package:flutter_music_app/widgets/search_song_cell.dart';
+import 'package:flutter_music_app/views/search/tabViews/search_song_list.dart';
 import 'package:get/get.dart';
 
 class SearchResultView extends StatefulWidget {
@@ -29,28 +34,10 @@ class _SearchResultViewState extends State<SearchResultView>
 
   List<Widget> get _tabViews {
     return [
-      ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: 10,
-        separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          return SearchSongCell(
-            isPlaying: index == _isPlayingIndex,
-            image: "assets/images/ar_2.png",
-            title: "晴天",
-            subtitle: "周杰伦 • 叶惠美 • 4:23",
-            onPressedPlay: () {
-              setState(() {
-                _isPlayingIndex = index;
-              });
-            },
-            onPressedMore: () {},
-          );
-        },
-      ),
-      Center(child: Text("歌手")),
-      Center(child: Text("专辑")),
-      Center(child: Text("歌单")),
+      const SearchSongList(), // 歌曲tabView
+      const SearchSingerList(), // 歌手tabView
+      const SearchAlbumList(), // 专辑tabView
+      const SearchPlaylistList(), // 歌单tabView
     ];
   }
 
@@ -120,50 +107,59 @@ class _SearchResultViewState extends State<SearchResultView>
           ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: kToolbarHeight - 10,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              indicator: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              labelColor: AppColors.textPrimary,
-              unselectedLabelColor: AppColors.textHint,
-              labelStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              tabs: _tabs,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // tabs: 歌曲、歌手、专辑、歌单、视频
+                SizedBox(
+                  height: kToolbarHeight - 10,
+                  child: TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    indicator: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    dividerColor: Colors.transparent,
+                    labelColor: AppColors.textPrimary,
+                    unselectedLabelColor: AppColors.textHint,
+                    labelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
+                    tabs: _tabs,
+                  ),
+                ),
+                // tabBarViews
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: _tabViews,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Text(
-              "找到 1,284 首相关歌曲",
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Expanded(
-            child: TabBarView(controller: _tabController, children: _tabViews),
-          ),
-        ],
+            // mini player: 迷你播放器
+            Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: kBottomNavigationBarHeight * 0.8,
+        color: Colors.black,
       ),
     );
   }

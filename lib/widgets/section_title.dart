@@ -14,27 +14,30 @@ class SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
-        showSeeAll
-            ? TextButton(
-                onPressed: onPressed,
-                child: Text(
-                  "更多",
-                  style: TextStyle(color: AppColors.primary, fontSize: 14),
-                ),
-              )
-            : const SizedBox(),
-      ],
+          showSeeAll
+              ? TextButton(
+                  onPressed: onPressed,
+                  child: Text(
+                    "更多",
+                    style: TextStyle(color: AppColors.primary, fontSize: 14),
+                  ),
+                )
+              : const SizedBox(),
+        ],
+      ),
     );
   }
 }

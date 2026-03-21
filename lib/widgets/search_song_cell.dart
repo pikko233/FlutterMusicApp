@@ -45,8 +45,8 @@ class SearchSongCell extends StatelessWidget {
             title,
             maxLines: 1,
             style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 15,
+              color: isPlaying ? AppColors.primary : AppColors.textPrimary,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -79,6 +79,7 @@ class SearchSongCell extends StatelessWidget {
       ),
       subtitle: Text(
         subtitle,
+        maxLines: 1,
         style: TextStyle(
           color: AppColors.textPrimary60,
           fontSize: 12,

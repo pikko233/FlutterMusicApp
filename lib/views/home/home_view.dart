@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/widgets/song_card.dart';
+import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:flutter_music_app/widgets/section_title.dart';
 import 'package:flutter_music_app/widgets/playlist_card.dart';
 
@@ -18,7 +18,7 @@ class _HomeViewState extends State<HomeView> {
       slivers: [
         SliverAppBar(
           pinned: true,
-          toolbarHeight: kToolbarHeight * 1.5,
+          toolbarHeight: kToolbarHeight * 1.2,
           backgroundColor: AppColors.bgPrimary,
           scrolledUnderElevation: 0,
           flexibleSpace: Padding(
@@ -30,8 +30,8 @@ class _HomeViewState extends State<HomeView> {
                 Row(
                   children: [
                     Container(
-                      width: 50,
-                      height: 50,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: AppColors.accent4,
                         borderRadius: BorderRadius.circular(25),
@@ -41,7 +41,7 @@ class _HomeViewState extends State<HomeView> {
                           "Z",
                           style: TextStyle(
                             color: AppColors.textPrimary,
-                            fontSize: 22,
+                            fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -49,18 +49,17 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     const SizedBox(width: 20),
                     Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "晚上好~",
                           style: TextStyle(
                             color: AppColors.textPrimary,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           "你想听点什么？",
                           style: TextStyle(
@@ -84,7 +83,6 @@ class _HomeViewState extends State<HomeView> {
               children: [
                 // 今日推荐
                 SectionTitle(title: "今日推荐", onPressed: () {}),
-                const SizedBox(height: 10),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -104,10 +102,8 @@ class _HomeViewState extends State<HomeView> {
                     }),
                   ),
                 ),
-                const SizedBox(height: 20),
                 // 最近播放
                 SectionTitle(title: "推荐电台", onPressed: () {}),
-                const SizedBox(height: 10),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -127,29 +123,26 @@ class _HomeViewState extends State<HomeView> {
                     }),
                   ),
                 ),
-                const SizedBox(height: 20),
                 // 最近播放
                 SectionTitle(
                   title: "最近播放",
                   onPressed: () {},
                   showSeeAll: false,
                 ),
-                const SizedBox(height: 10),
                 Column(
                   spacing: 10,
                   children: List.generate(3, (context) {
-                    return SongCard(
+                    return SearchSongCell(
                       image: "assets/images/ar_4.png",
-                      title: "As It Was",
-                      subtitle: "Harry Styles · 2:47",
-                      onPressed: () {},
+                      title: "晴天",
+                      subtitle: "周杰伦 • 4:29",
+                      onPressedPlay: () {},
+                      onPressedMore: () {},
                     );
                   }),
                 ),
-                const SizedBox(height: 20),
                 // 为你打造
                 SectionTitle(title: "为你打造", onPressed: () {}),
-                const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
