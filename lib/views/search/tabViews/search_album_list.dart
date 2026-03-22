@@ -23,8 +23,8 @@ class SearchAlbumList extends StatelessWidget {
           sliver: SliverGrid.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
               childAspectRatio: 1.8,
             ),
             itemCount: 12,

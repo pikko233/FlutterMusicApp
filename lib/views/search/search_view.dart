@@ -65,7 +65,12 @@ class _SearchViewState extends State<SearchView> {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.only(
+              top: 10.0,
+              left: 20,
+              right: 20,
+              bottom: 80,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

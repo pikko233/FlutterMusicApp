@@ -114,8 +114,9 @@ class _SearchResultViewState extends State<SearchResultView>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // tabs: 歌曲、歌手、专辑、歌单、视频
-                SizedBox(
+                Container(
                   height: kToolbarHeight - 10,
+                  color: AppColors.bgPrimary,
                   child: TabBar(
                     controller: _tabController,
                     isScrollable: true,
@@ -158,7 +159,7 @@ class _SearchResultViewState extends State<SearchResultView>
         ),
       ),
       bottomNavigationBar: Container(
-        height: kBottomNavigationBarHeight * 0.8,
+        height: kBottomNavigationBarHeight * 0.5,
         color: Colors.black,
       ),
     );

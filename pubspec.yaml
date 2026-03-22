@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.6.6 # getx状态管理工具 - 最新版本(4.7.*)命名路由跳转有bug，这里用4.6.6
   intl: ^0.20.2 # 数字格式化工具 - 用于千分位分隔符
+  audio_video_progress_bar: ^2.0.3 # 音频播放进度条
 
 dev_dependencies:
   flutter_test:

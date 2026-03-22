@@ -4,6 +4,7 @@ import 'package:flutter_music_app/views/home/home_view.dart';
 import 'package:flutter_music_app/views/library/library_view.dart';
 import 'package:flutter_music_app/views/my/my_view.dart';
 import 'package:flutter_music_app/views/search/search_view.dart';
+import 'package:flutter_music_app/widgets/mini_player.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -23,7 +24,14 @@ class _MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: selectedView),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            selectedView,
+            Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: (value) {
           setState(() {
