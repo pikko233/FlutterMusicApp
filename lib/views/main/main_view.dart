@@ -25,11 +25,23 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            selectedView,
-            Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
-          ],
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.bgPrimary, AppColors.bgCard],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                selectedView,
+                Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
+              ],
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

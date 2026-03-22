@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/widgets/search_result_count.dart';
 import 'package:flutter_music_app/widgets/search_singer_cell.dart';
+import 'package:get/get.dart';
 
 class SearchSingerList extends StatelessWidget {
   const SearchSingerList({super.key});
@@ -29,7 +31,10 @@ class SearchSingerList extends StatelessWidget {
                 image: "assets/images/ar_4.png",
                 title: "周杰伦",
                 subtitle: "歌手 • 1284首歌曲",
-                onPressed: () {},
+                onPressed: () {
+                  print("跳转至歌手主页");
+                  Get.toNamed(AppRoutes.singerDetail);
+                },
                 onPressedSub: () {},
               );
             },

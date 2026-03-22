@@ -17,7 +17,8 @@ class _SearchViewState extends State<SearchView> {
       slivers: [
         SliverAppBar(
           pinned: true,
-          backgroundColor: AppColors.bgPrimary,
+          backgroundColor: AppColors.bgCard,
+          elevation: 0,
           scrolledUnderElevation: 0,
           title: Row(
             children: [
@@ -38,7 +39,7 @@ class _SearchViewState extends State<SearchView> {
                     hintText: "搜索音乐、视频、博客、歌词",
                     hintStyle: TextStyle(color: AppColors.textHint),
                     filled: true,
-                    fillColor: AppColors.bgCard,
+                    fillColor: AppColors.bgPrimary.withValues(alpha: 0.3),
                     prefixIcon: Icon(Icons.search, color: AppColors.textHint),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),

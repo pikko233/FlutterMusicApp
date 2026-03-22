@@ -3,13 +3,15 @@ import 'package:flutter_music_app/constants/app_colors.dart';
 
 class SectionTitle extends StatelessWidget {
   final String title;
-  final bool showSeeAll;
+  final bool showMore;
+  final String showMoreLabel;
   final VoidCallback onPressed;
   const SectionTitle({
     super.key,
     required this.title,
     required this.onPressed,
-    this.showSeeAll = true,
+    this.showMore = true,
+    this.showMoreLabel = "更多",
   });
 
   @override
@@ -23,19 +25,19 @@ class SectionTitle extends StatelessWidget {
             title,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 17,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
           ),
-          showSeeAll
+          showMore
               ? TextButton(
                   onPressed: onPressed,
                   child: Text(
-                    "更多",
-                    style: TextStyle(color: AppColors.primary, fontSize: 14),
+                    showMoreLabel,
+                    style: TextStyle(color: AppColors.primary, fontSize: 13),
                   ),
                 )
-              : const SizedBox(),
+              : const SizedBox.shrink(),
         ],
       ),
     );

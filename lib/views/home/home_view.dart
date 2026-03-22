@@ -19,7 +19,8 @@ class _HomeViewState extends State<HomeView> {
         SliverAppBar(
           pinned: true,
           toolbarHeight: kToolbarHeight * 1.2,
-          backgroundColor: AppColors.bgPrimary,
+          backgroundColor: AppColors.bgCard,
+          elevation: 0,
           scrolledUnderElevation: 0,
           flexibleSpace: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
@@ -129,11 +130,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
                 // 最近播放
-                SectionTitle(
-                  title: "最近播放",
-                  onPressed: () {},
-                  showSeeAll: false,
-                ),
+                SectionTitle(title: "最近播放", onPressed: () {}, showMore: false),
                 Column(
                   spacing: 10,
                   children: List.generate(3, (context) {
@@ -161,12 +158,12 @@ class _HomeViewState extends State<HomeView> {
                         borderRadius: BorderRadius.circular(16),
                         child: Image.asset(
                           "assets/images/ar_2.png",
-                          width: 80,
-                          height: 80,
+                          width: 68,
+                          height: 68,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           spacing: 6,
@@ -198,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       IconButton(
                         onPressed: () {},
-                        iconSize: 60,
+                        iconSize: 50,
                         icon: Icon(Icons.play_circle_fill_rounded),
                       ),
                     ],

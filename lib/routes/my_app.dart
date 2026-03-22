@@ -4,6 +4,7 @@ import 'package:flutter_music_app/constants/app_theme.dart';
 import 'package:flutter_music_app/views/main/main_view.dart';
 import 'package:flutter_music_app/views/playlist/playlist_detail_view.dart';
 import 'package:flutter_music_app/views/search/search_result_view.dart';
+import 'package:flutter_music_app/views/singer/singer_detail_view.dart';
 import 'package:flutter_music_app/views/splash_view.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +28,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: AppRoutes.playlistDetail,
           page: () => const PlaylistDetailView(),
+        ),
+        GetPage(
+          name: AppRoutes.singerDetail,
+          page: () => const SingerDetailView(),
         ),
       ],
     );
