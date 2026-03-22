@@ -1,6 +1,8 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:get/get.dart';
 
 class MiniPlayer extends StatefulWidget {
   const MiniPlayer({super.key});
@@ -34,17 +36,22 @@ class _MiniPlayerState extends State<MiniPlayer> {
             ),
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              onTap: () {},
+              onTap: () {
+                Get.toNamed(AppRoutes.playerScreen);
+              },
               dense: true,
               visualDensity: VisualDensity.compact,
               contentPadding: const EdgeInsets.only(left: 15),
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  "assets/images/ar_4.png",
-                  width: 35,
-                  height: 35,
-                  fit: BoxFit.cover,
+              leading: Hero(
+                tag: "song_image",
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    "assets/images/ar_4.png",
+                    width: 35,
+                    height: 35,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               title: Text(
