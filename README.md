@@ -24,12 +24,16 @@ samples, guidance on mobile development, and a full API reference.
 
 **原因：** 网易云 CDN 同时校验 `Referer` 和 `User-Agent`，缺一不可。
 
-**解决方案：** 使用 `Image.network` 时加上以下 headers：
+**解决方案：** 使用 `cached_network_image` 包（`Image.network` 的 headers 参数在某些平台上不生效（在macOS上是不生效的，其他平台暂未得知）。用 `cached_network_image` 包来处理，它对 headers 支持更好。），安装：
+
+```
+flutter pub add cached_network_image
+```
 
 ```dart
-Image.network(
-  url,
-  headers: {
+CachedNetworkImage(
+  imageUrl: url,
+  httpHeaders: {
     'Referer': 'https://music.163.com',
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   },
