@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/viewmodels/home_view_model.dart';
 import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:flutter_music_app/widgets/section_title.dart';
 import 'package:flutter_music_app/widgets/playlist_card.dart';
+import 'package:get/get.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -12,6 +14,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final homeVM = Get.put(HomeViewModel());
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -92,20 +95,25 @@ class _HomeViewState extends State<HomeView> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(5, (index) {
-                      return Padding(
-                        padding: index != 4
-                            ? const EdgeInsets.only(right: 10)
-                            : const EdgeInsets.all(0),
-                        child: PlaylistCard(
-                          image: "assets/images/ar_1.png",
-                          title: "SongName",
-                          subtitle: "Singer",
-                        ),
-                      );
-                    }),
+                  child: Obx(
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: List.generate(homeVM.recommendPlaylist.length, (
+                        index,
+                      ) {
+                        final item = homeVM.recommendPlaylist[index];
+                        return Padding(
+                          padding: index != 4
+                              ? const EdgeInsets.only(right: 10)
+                              : const EdgeInsets.all(0),
+                          child: PlaylistCard(
+                            image: item.picUrl,
+                            title: item.name,
+                            subtitle: item.playCount.toString(),
+                          ),
+                        );
+                      }),
+                    ),
                   ),
                 ),
                 // 最近播放
