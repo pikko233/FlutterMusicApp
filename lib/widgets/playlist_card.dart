@@ -1,14 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:get/get.dart';
 
 class PlaylistCard extends StatelessWidget {
+  final int id;
   final String image;
   final String title;
   final String subtitle;
   const PlaylistCard({
     super.key,
+    required this.id,
     required this.image,
     required this.title,
     required this.subtitle,
@@ -17,7 +21,9 @@ class PlaylistCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Get.toNamed(AppRoutes.playlistDetail, arguments: {'id': id});
+      },
       borderRadius: BorderRadius.circular(8),
       child: SizedBox(
         width: 120,
@@ -31,7 +37,7 @@ class PlaylistCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               title,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
             ),

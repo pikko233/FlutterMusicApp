@@ -2,7 +2,7 @@ import 'package:flutter_music_app/models/playlist_model.dart';
 import 'package:flutter_music_app/repositories/home_repository.dart';
 import 'package:get/get.dart';
 
-class HomeViewModel extends GetxController {
+class HomeViewmodel extends GetxController {
   final recommendPlaylist = <PlaylistModel>[].obs; // 推荐歌单
   final isLoading = false.obs; // 是否加载中
 
