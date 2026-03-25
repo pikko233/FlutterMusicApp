@@ -92,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               children: [
                 // 今日推荐
-                SectionTitle(title: "今日推荐", onPressed: () {}),
+                SectionTitle(title: "推荐歌单", onPressed: () {}),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -125,7 +125,7 @@ class _HomeViewState extends State<HomeView> {
                           ),
                   ),
                 ),
-                // 最近播放
+                // 推荐电台
                 SectionTitle(title: "推荐电台", onPressed: () {}),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -147,8 +147,30 @@ class _HomeViewState extends State<HomeView> {
                     }),
                   ),
                 ),
+                // 排行榜
+                SectionTitle(title: "排行榜", onPressed: () {}),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: List.generate(5, (index) {
+                      return Padding(
+                        padding: index != 4
+                            ? const EdgeInsets.only(right: 10)
+                            : const EdgeInsets.all(0),
+                        child: PlaylistCard(
+                          id: 0,
+                          image: "assets/images/ar_2.png",
+                          title: "SongName",
+                          subtitle: "Singer",
+                        ),
+                      );
+                    }),
+                  ),
+                ),
                 // 最近播放
-                SectionTitle(title: "最近播放", onPressed: () {}, showMore: false),
+                SectionTitle(title: "最近常听", onPressed: () {}, showMore: false),
                 Column(
                   spacing: 10,
                   children: List.generate(3, (context) {

@@ -1,17 +1,25 @@
-import 'package:flutter_music_app/models/playlist_detail_model.dart';
-import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/models/playlist_model.dart';
+import 'package:flutter_music_app/models/recommend_playlist_model.dart';
+import 'package:flutter_music_app/models/playlist_song_model.dart';
 import 'package:flutter_music_app/utils/request.dart';
 
-class PlaylistDetailRepository {
+class PlaylistRepository {
+  // 获取首页推荐歌单
+  static Future<List<RecommendPlaylistModel>> getRecommendPlaylist({
+    int limit = 30,
+  }) async {
+    final res = await Request.get("/personalized", params: {"limit": limit});
+    return (res.data['result'] as List)
+        .map((e) => RecommendPlaylistModel.fromMap(e))
+        .toList();
+  }
+
   // 获取歌单详情
   // id：必填，歌单id
   // s：选填，歌单最近的s个收藏者，默认为8
-  static Future<PlaylistDetailModel> getPlaylistDetail(
-    int id, {
-    int s = 8,
-  }) async {
+  static Future<PlaylistModel> getPlaylistDetail(int id, {int s = 8}) async {
     final res = await Request.get('/playlist/detail', params: {'id': id});
-    return PlaylistDetailModel.fromMap(res.data['playlist']);
+    return PlaylistModel.fromMap(res.data['playlist']);
   }
 
   // 获取歌单内的歌曲
@@ -22,7 +30,7 @@ class PlaylistDetailRepository {
   // 你传入limit=50&offset=0等价于limit=50，你会得到第1-50首歌曲
   // 你传入limit=50&offset=50，你会得到第51-100首歌曲
   // 如果你设置limit=50&offset=100，你就会得到第101-150首歌曲
-  static Future<List<SongModel>> getSongsInPlaylist(
+  static Future<List<PlaylistSongModel>> getSongsInPlaylist(
     int id, {
     int? limit,
     int offset = 0,
@@ -32,7 +40,7 @@ class PlaylistDetailRepository {
       params: {'id': id, 'limit': limit, 'offset': offset},
     );
     return (res.data['songs'] as List)
-        .map((e) => SongModel.fromMap(e))
+        .map((e) => PlaylistSongModel.fromMap(e))
         .toList();
   }
 }

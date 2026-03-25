@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
-import 'package:flutter_music_app/models/playlist_detail_model.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:flutter_music_app/utils/time_util.dart';
 import 'package:flutter_music_app/viewmodels/playlist_detail_viewmodel.dart';
@@ -18,14 +17,14 @@ class PlaylistDetailView extends StatefulWidget {
 }
 
 class _PlaylistDetailViewState extends State<PlaylistDetailView> {
-  late PlaylistDetailViewmodel playlistDetailVM;
+  late PlaylistDetailViewmodel _playlistDetailVM;
   bool _descExpanded = false; // 是否展开歌单简介
 
   @override
   void initState() {
     super.initState();
     print('页面传参id:${Get.arguments['id'] ?? 0}');
-    playlistDetailVM = Get.put(
+    _playlistDetailVM = Get.put(
       PlaylistDetailViewmodel(id: Get.arguments['id'] ?? 0),
     );
   }
@@ -45,15 +44,11 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
         child: Stack(
           children: [
             Obx(() {
-              if (playlistDetailVM.playlistDetail.value == null ||
-                  playlistDetailVM.songList.isEmpty) {
-                return const SizedBox(
-                  height: 160,
-                  child: Center(child: CircularProgressIndicator()),
-                );
+              if (_playlistDetailVM.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
               }
-              final playlist = playlistDetailVM.playlistDetail.value!;
-              final songList = playlistDetailVM.songList;
+              final playlist = _playlistDetailVM.playlistDetail.value!;
+              final songList = _playlistDetailVM.songList;
               return CustomScrollView(
                 slivers: [
                   SliverAppBar(
@@ -80,6 +75,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       ),
                     ],
                   ),
+                  // 歌单封面、歌单简介、播放全部按钮、随机播放按钮
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverToBoxAdapter(
@@ -108,7 +104,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                           const SizedBox(height: 4),
                           // 歌曲数量、播放量
                           Text(
-                            "by 网易云音乐 • ${playlist.trackCount}首 • 播放量 ${CountUtil.formatCount(playlist.playCount)}",
+                            "by ${playlist.creator?.nickname ?? '网易云音乐'} • ${playlist.trackCount}首 • 播放量 ${CountUtil.formatCount(playlist.playCount)}",
                             style: TextStyle(
                               color: AppColors.textPrimary60,
                               fontSize: 13,
@@ -143,64 +139,50 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
+                                  child: ElevatedButton.icon(
+                                    clipBehavior: Clip.antiAlias,
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.play_arrow,
+                                      color: AppColors.textPrimary,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary,
-                                      borderRadius: BorderRadius.circular(20),
+                                    label: Text(
+                                      "全部播放",
+                                      style: TextStyle(
+                                        color: AppColors.textPrimary,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.play_arrow, size: 20),
-                                        Text(
-                                          "播放全部",
-                                          style: TextStyle(
-                                            color: AppColors.textPrimary,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ],
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      overlayColor: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.sync_alt,
+                                      color: AppColors.primary,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.bgPrimary,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: BoxBorder.all(
+                                    label: Text(
+                                      "随机播放",
+                                      style: TextStyle(
                                         color: AppColors.primary,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
                                       ),
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.sync_alt,
-                                          color: AppColors.primary,
-                                          size: 20,
-                                        ),
-                                        Text(
-                                          "随机播放",
-                                          style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.bgCard,
+                                      overlayColor: Colors.white.withValues(
+                                        alpha: 0.2,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -214,69 +196,83 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 // 喜爱数量
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.favorite,
-                                      color: AppColors.textSecondary,
-                                      size: 15,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      "2.4万",
-                                      style: TextStyle(
+                                Expanded(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.favorite,
                                         color: AppColors.textSecondary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        size: 15,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        CountUtil.formatCount(
+                                          playlist.subscribedCount,
+                                        ),
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 // 评论数量
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.chat,
-                                      color: AppColors.textSecondary,
-                                      size: 15,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      "8,392",
-                                      style: TextStyle(
+                                Expanded(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.chat,
                                         color: AppColors.textSecondary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        size: 15,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        CountUtil.formatCount(
+                                          playlist.commentCount,
+                                        ),
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 // 分享
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.share,
-                                      color: AppColors.textSecondary,
-                                      size: 15,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      "分享",
-                                      style: TextStyle(
+                                Expanded(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.share,
                                         color: AppColors.textSecondary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        size: 15,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        CountUtil.formatCount(
+                                          playlist.shareCount,
+                                        ),
+                                        style: TextStyle(
+                                          color: AppColors.textSecondary,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -315,6 +311,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       ),
                     ),
                   ),
+                  // 歌曲列表
                   SliverPadding(
                     padding: const EdgeInsets.only(
                       top: 10,
@@ -326,17 +323,17 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       itemCount: songList.length,
                       itemBuilder: (context, index) {
                         final item = songList[index];
-                        final singersName = item.ar
-                            .map((e) => e.name)
-                            .join(' / ');
                         return PlaylistSongCell(
                           index: index,
                           image: item.al.picUrl,
                           title: item.name,
                           subtitle:
-                              "$singersName • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
+                              "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                           onPressedPlay: () {
-                            Get.toNamed(AppRoutes.playerScreen);
+                            Get.toNamed(
+                              AppRoutes.playerScreen,
+                              arguments: {'id': item.id},
+                            );
                           },
                           onPressedMore: () {},
                         );

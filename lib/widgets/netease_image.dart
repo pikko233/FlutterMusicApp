@@ -16,6 +16,9 @@ class NeteaseImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (url.isEmpty) {
+      return SizedBox(width: width, height: height);
+    }
     return CachedNetworkImage(
       imageUrl: url,
       width: width,

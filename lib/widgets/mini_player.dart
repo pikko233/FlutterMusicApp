@@ -41,7 +41,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
               },
               dense: true,
               visualDensity: VisualDensity.compact,
-              contentPadding: const EdgeInsets.only(left: 15),
+              contentPadding: const EdgeInsets.only(left: 15, right: 5),
               leading: Hero(
                 tag: "song_image",
                 child: ClipRRect(
