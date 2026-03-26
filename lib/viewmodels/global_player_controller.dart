@@ -6,9 +6,9 @@ import 'package:flutter_music_app/repositories/song_repository.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
-class PlayerScreenViewmodel extends GetxController {
-  final int id;
-  PlayerScreenViewmodel({required this.id});
+class GlobalPlayerController extends GetxController {
+  late AudioPlayer _audioPlayer;
+
   final isLoading = false.obs;
   final isAvailable = false.obs; // 音乐是否可用（是否有版权）
   final song = Rxn<SongModel>(); // 歌曲信息，如歌曲名称、歌手、歌曲封面图片等等
@@ -16,9 +16,10 @@ class PlayerScreenViewmodel extends GetxController {
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
 
-  late AudioPlayer _audioPlayer;
-
   Stream<PlayerState> get playerStateStream => _audioPlayer.playerStateStream;
+
+  bool get isCompleted =>
+      _audioPlayer.processingState == ProcessingState.completed;
 
   Stream<PositionData> get positionDataStream =>
       Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
@@ -31,20 +32,21 @@ class PlayerScreenViewmodel extends GetxController {
           duration: duration ?? Duration.zero,
         ),
       );
+
   @override
   void onInit() {
     super.onInit();
     _audioPlayer = AudioPlayer();
-    _audioPlayer.playerStateStream.listen((state) {
-      if (state.processingState == ProcessingState.completed) {
-        // 歌曲播放完毕
+    _audioPlayer.processingStateStream.listen((state) {
+      if (state == ProcessingState.completed) {
+        // 当前歌曲播放完毕
         isPlaying.value = false;
       }
     });
-    _loadData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> playSong(int id) async {
+    if (currentSongId.value == id) return; // 如果点击的是同一首歌就返回
     try {
       isLoading.value = true;
       currentSongId.value = id;
@@ -83,8 +85,12 @@ class PlayerScreenViewmodel extends GetxController {
 
   // 播放歌曲
   Future<void> play() async {
-    await _audioPlayer.play();
-    isPlaying.value = true;
+    if (isCompleted) {
+      _audioPlayer.seek(Duration(milliseconds: 0));
+    } else {
+      await _audioPlayer.play();
+      isPlaying.value = true;
+    }
   }
 
   // 暂停歌曲

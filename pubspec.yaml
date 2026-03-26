@@ -40,6 +40,9 @@ dependencies:
   dio: ^5.9.2 # http请求库
   cached_network_image: ^3.4.1 # 将网络图片缓存至本地，防止刷新页面时重新发送请求获取图片，浪费资源
   marquee: ^2.2.3 # 文字跑马灯效果
+  just_audio: ^0.10.5 # 音频播放功能
+  just_audio_background: ^0.0.1-beta.17 # 实现后台播放功能
+  rxdart: ^0.28.0 # 合并数据流
 
 dev_dependencies:
   flutter_test:
