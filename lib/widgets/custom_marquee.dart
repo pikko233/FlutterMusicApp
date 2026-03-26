@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:marquee/marquee.dart';
 
 class CustomMarquee extends StatelessWidget {

@@ -27,7 +27,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
     _songId = Get.arguments['id'] ?? 0;
     print("播放歌曲id: $_songId");
     _playerScreenVM = Get.put(
-      PlayerScreenViewmodel(ids: Get.arguments?['id'] ?? 0),
+      PlayerScreenViewmodel(id: Get.arguments?['id'] ?? 0),
     );
   }
 
