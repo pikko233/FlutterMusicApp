@@ -2,6 +2,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/viewmodels/player_screen_viewmodel.dart';
+import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:get/get.dart';
 
@@ -53,10 +54,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.more_horiz, color: AppColors.textPrimary60),
-            ),
+            icon: Icon(Icons.more_horiz, color: AppColors.textPrimary60),
           ),
         ],
       ),
@@ -77,21 +75,22 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
           return Column(
             children: [
               // 歌曲封面图片
-              Hero(
-                tag: "song_image",
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(media.width * 0.3),
-                  child: NeteaseImage(
-                    url: _song!.picUrl,
-                    width: media.width * 0.6,
-                    height: media.width * 0.6,
-                  ),
-                  // child: Image.asset(
-                  //   "assets/images/ar_4.png",
-                  //   width: media.width * 0.6,
-                  //   height: media.width * 0.6,
-                  //   fit: BoxFit.cover,
-                  // ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Hero(
+                      tag: "song_image",
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(media.width * 0.3),
+                        child: NeteaseImage(
+                          url: _song!.picUrl,
+                          width: media.width * 0.6,
+                          height: media.width * 0.6,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 30),
@@ -110,27 +109,35 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                       size: 20,
                     ),
                   ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _song.name,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
+                  // 歌曲名称、专辑、歌手
+                  Expanded(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 28,
+                          child: CustomMarquee(
+                            text: _song.name,
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
-                      ),
-                      // const SizedBox(height: 5),
-                      Text(
-                        "${_song.al.name} • ${_song.singersName}",
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                        // const SizedBox(height: 5),
+                        SizedBox(
+                          height: 20,
+                          child: CustomMarquee(
+                            text: "${_song.al.name} • ${_song.singersName}",
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   // 添加至歌单
                   IconButton(

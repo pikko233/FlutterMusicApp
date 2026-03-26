@@ -39,6 +39,7 @@ dependencies:
   audio_video_progress_bar: ^2.0.3 # 音频播放进度条
   dio: ^5.9.2 # http请求库
   cached_network_image: ^3.4.1 # 将网络图片缓存至本地，防止刷新页面时重新发送请求获取图片，浪费资源
+  marquee: ^2.2.3 # 文字跑马灯效果
 
 dev_dependencies:
   flutter_test:

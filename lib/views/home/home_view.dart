@@ -103,7 +103,7 @@ class _HomeViewState extends State<HomeView> {
                             child: Center(child: CircularProgressIndicator()),
                           )
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: List.generate(
                               homeVM.recommendPlaylist.length,
                               (index) {
