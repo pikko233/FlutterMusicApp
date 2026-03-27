@@ -22,7 +22,10 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
   @override
   void initState() {
     super.initState();
-    _player.playSong(Get.arguments?['id'] ?? 0); // 播放歌曲
+    _player.playSong(
+      Get.arguments?['id'] ?? 0,
+      needPlay: Get.arguments?['needPlay'] ?? true,
+    ); // 播放歌曲
     _rotationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 30),
@@ -66,12 +69,8 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
       body: StreamBuilder<PlayerState>(
         stream: _player.playerStateStream,
         builder: (context, snapshot) {
-          final playerState = snapshot.data;
-          final processingState = playerState?.processingState;
-          final playing =
-              playerState?.playing == true &&
-              processingState != ProcessingState.completed; // 当前歌曲正在播放 且 未播放完毕
-          if (playing) {
+          final isPlaying = _player.isPlaying.value; // 当前歌曲正在播放 且 未播放完毕
+          if (isPlaying) {
             _rotationController.repeat(); // 歌曲播放时旋转歌曲封面图片
           } else {
             _rotationController.stop(); // 歌曲暂停时停止旋转
@@ -232,18 +231,13 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
                       // 暂停/播放按钮
                       IconButton.filled(
                         onPressed: () {
-                          if (playing) {
+                          if (isPlaying) {
                             _player.pause();
                           } else {
                             _player.play();
                           }
                         },
-                        icon: Icon(
-                          playing == true &&
-                                  processingState != ProcessingState.completed
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                        ),
+                        icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
                         iconSize: 40,
                         style: IconButton.styleFrom(
                           backgroundColor: AppColors.primary,

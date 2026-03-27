@@ -37,23 +37,24 @@ class PlayerService extends GetxController {
   void onInit() {
     super.onInit();
     _audioPlayer = AudioPlayer(); // 实例化播放器
-    _audioPlayer.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed) {
-        // 当前歌曲播放完毕
-        isPlaying.value = false;
-      }
+    _audioPlayer.playerStateStream.listen((state) {
+      isPlaying.value =
+          state.playing && state.processingState != ProcessingState.completed;
     });
   }
 
-  Future<void> playSong(int id) async {
+  Future<void> playSong(int id, {bool needPlay = true}) async {
     if (currentSongId.value == id) {
-      // 如果点击的是同一首歌就播放，后面逻辑不执行
-      play();
+      // 如果点击的是同一首歌，后面逻辑不执行
+      if (needPlay) {
+        // 从歌单列表点击来就播放，从miniplayer迷你播放器点进来不自动播放
+        play();
+      }
       return;
     }
     try {
       isLoading.value = true;
-      await _checkSong(id);
+      isAvailable.value = await checkSong(id);
       if (!isAvailable.value) return;
       currentSongId.value = id;
       await _getSongDetail(id);
@@ -72,41 +73,41 @@ class PlayerService extends GetxController {
   }
 
   // 检查歌曲是否有版权
-  Future<void> _checkSong(int id) async {
+  Future<bool> checkSong(int id) async {
     final res = await SongRepository.checkSong(id);
-    isAvailable.value = res;
+    return res;
   }
 
   // 获取歌曲URL
   Future<void> _getSongUrl(int id) async {
     final res = await SongRepository.getSongUrl(id, level: 'higher');
     songUrl.value = res as String?;
-    if (songUrl.value != null) {
-      await _audioPlayer.setUrl(songUrl.value!);
-      play();
-    }
+    await _audioPlayer.setUrl(songUrl.value!);
+    play();
   }
 
   // 播放歌曲
-  Future<void> play() async {
+  void play() {
     if (isCompleted) {
       // 如果当前歌曲播放完毕，则从头开始播放
       _audioPlayer.seek(Duration(milliseconds: 0));
-    } else {
-      await _audioPlayer.play();
-      isPlaying.value = true;
     }
+    // ps
+    // audioPlayer.play()不能放await，否则这个方法会阻塞到播放结束
+    // 暂停倒是加不加await都无所谓 - 被这里的bug搞了好久，真是血的教训
+    // pps
+    // 直接监听playerStateStream就行了，不要手动管理isPlaying状态
+    _audioPlayer.play();
   }
 
   // 暂停歌曲
-  Future<void> pause() async {
-    await _audioPlayer.pause();
-    isPlaying.value = false;
+  void pause() {
+    _audioPlayer.pause();
   }
 
   // 跳转歌曲进度条
-  Future<void> seek(Duration position) async {
-    await _audioPlayer.seek(position);
+  void seek(Duration position) {
+    _audioPlayer.seek(position);
   }
 }
 
@@ -119,5 +120,5 @@ class PositionData {
     required this.position,
     required this.bufferedPosition,
     required this.duration,
-  }); // 歌曲总时长
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:flutter_music_app/utils/time_util.dart';
 import 'package:flutter_music_app/viewmodels/playlist_detail_viewmodel.dart';
@@ -19,6 +20,7 @@ class PlaylistDetailView extends StatefulWidget {
 class _PlaylistDetailViewState extends State<PlaylistDetailView> {
   late PlaylistDetailViewmodel _playlistDetailVM;
   bool _descExpanded = false; // 是否展开歌单简介
+  final _player = Get.find<PlayerService>();
 
   @override
   void initState() {
@@ -329,12 +331,18 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                           title: item.name,
                           subtitle:
                               "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
-                          onPressedPlay: () {
-                            // TODO 这里跳转应该先判断一下音乐是否有版权，后面再补一下吧
-                            Get.toNamed(
-                              AppRoutes.playerScreen,
-                              arguments: {'id': item.id},
+                          onPressedPlay: () async {
+                            // 先判断一下音乐是否有版权
+                            final isAvailable = await _player.checkSong(
+                              item.id,
                             );
+                            if (isAvailable) {
+                              // 如果音乐有版权，则跳转播放播放
+                              Get.toNamed(
+                                AppRoutes.playerScreen,
+                                arguments: {'id': item.id},
+                              );
+                            }
                           },
                           onPressedMore: () {},
                         );
