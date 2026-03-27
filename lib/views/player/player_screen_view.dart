@@ -1,7 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/viewmodels/global_player_controller.dart';
+import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:get/get.dart';
@@ -16,14 +16,13 @@ class PlayerScreenView extends StatefulWidget {
 
 class _PlayerScreenViewState extends State<PlayerScreenView>
     with SingleTickerProviderStateMixin {
-  final GlobalPlayerController _playerController =
-      Get.find<GlobalPlayerController>();
+  final PlayerService _player = Get.find<PlayerService>();
   late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
-    _playerController.playSong(Get.arguments?['id'] ?? 0); // 播放歌曲
+    _player.playSong(Get.arguments?['id'] ?? 0); // 播放歌曲
     _rotationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 30),
@@ -65,7 +64,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
         ],
       ),
       body: StreamBuilder<PlayerState>(
-        stream: _playerController.playerStateStream,
+        stream: _player.playerStateStream,
         builder: (context, snapshot) {
           final playerState = snapshot.data;
           final processingState = playerState?.processingState;
@@ -87,10 +86,10 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
               ),
             ),
             child: Obx(() {
-              if (_playerController.isLoading.value) {
+              if (_player.isLoading.value) {
                 return Center(child: CircularProgressIndicator());
               }
-              final song = _playerController.song.value;
+              final song = _player.song.value;
               return Column(
                 children: [
                   // 歌曲封面图片
@@ -179,7 +178,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
                   const SizedBox(height: 20),
                   // 音频进度条
                   StreamBuilder<PositionData>(
-                    stream: _playerController.positionDataStream,
+                    stream: _player.positionDataStream,
                     builder: (context, snapshot) {
                       final positionData = snapshot.data;
                       return ProgressBar(
@@ -198,7 +197,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
                           fontSize: 13,
                         ),
                         onSeek: (duration) {
-                          _playerController.seek(duration);
+                          _player.seek(duration);
                         },
                       );
                     },
@@ -234,9 +233,9 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
                       IconButton.filled(
                         onPressed: () {
                           if (playing) {
-                            _playerController.pause();
+                            _player.pause();
                           } else {
-                            _playerController.play();
+                            _player.play();
                           }
                         },
                         icon: Icon(

@@ -109,7 +109,9 @@ class _HomeViewState extends State<HomeView> {
                               (index) {
                                 final item = homeVM.recommendPlaylist[index];
                                 return Padding(
-                                  padding: index != 4
+                                  padding:
+                                      index !=
+                                          homeVM.recommendPlaylist.length - 1
                                       ? const EdgeInsets.only(right: 10)
                                       : const EdgeInsets.all(0),
                                   child: PlaylistCard(

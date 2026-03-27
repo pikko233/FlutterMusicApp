@@ -330,6 +330,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                           subtitle:
                               "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                           onPressedPlay: () {
+                            // TODO 这里跳转应该先判断一下音乐是否有版权，后面再补一下吧
                             Get.toNamed(
                               AppRoutes.playerScreen,
                               arguments: {'id': item.id},
