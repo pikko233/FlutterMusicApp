@@ -14,10 +14,8 @@ class PlayerScreenView extends StatefulWidget {
   State<PlayerScreenView> createState() => _PlayerScreenViewState();
 }
 
-class _PlayerScreenViewState extends State<PlayerScreenView>
-    with SingleTickerProviderStateMixin {
+class _PlayerScreenViewState extends State<PlayerScreenView> {
   final PlayerService _player = Get.find<PlayerService>();
-  late AnimationController _rotationController;
 
   @override
   void initState() {
@@ -26,17 +24,6 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
       Get.arguments?['id'] ?? 0,
       needPlay: Get.arguments?['needPlay'] ?? true,
     ); // 播放歌曲
-    _rotationController = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 30),
-    )..repeat();
-    _rotationController.stop();
-  }
-
-  @override
-  void dispose() {
-    _rotationController.dispose();
-    super.dispose();
   }
 
   @override
@@ -70,11 +57,6 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
         stream: _player.playerStateStream,
         builder: (context, snapshot) {
           final isPlaying = _player.isPlaying.value; // 当前歌曲正在播放 且 未播放完毕
-          if (isPlaying) {
-            _rotationController.repeat(); // 歌曲播放时旋转歌曲封面图片
-          } else {
-            _rotationController.stop(); // 歌曲暂停时停止旋转
-          }
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
@@ -96,14 +78,11 @@ class _PlayerScreenViewState extends State<PlayerScreenView>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        RotationTransition(
-                          turns: _rotationController,
-                          child: Hero(
-                            tag: "song_image",
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                media.width * 0.3,
-                              ),
+                        Hero(
+                          tag: "song_image",
+                          child: RotationTransition(
+                            turns: _player.rotationController,
+                            child: ClipOval(
                               child: NeteaseImage(
                                 url: song!.picUrl,
                                 width: media.width * 0.6,

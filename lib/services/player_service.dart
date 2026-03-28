@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:get/get.dart' hide Rx;
 
@@ -15,6 +17,8 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
+
+  late AnimationController rotationController; // 歌曲封面图片旋转动画控制
 
   Stream<PlayerState> get playerStateStream => _audioPlayer.playerStateStream;
 
@@ -37,10 +41,27 @@ class PlayerService extends GetxController {
   void onInit() {
     super.onInit();
     _audioPlayer = AudioPlayer(); // 实例化播放器
+    rotationController = AnimationController(
+      // vsync: this,
+      vsync: _StandaloneTickerProvider(),
+      duration: Duration(seconds: 30),
+    )..repeat(); // 实例化旋转动画控制器
+    rotationController.stop();
     _audioPlayer.playerStateStream.listen((state) {
       isPlaying.value =
           state.playing && state.processingState != ProcessingState.completed;
+      if (isPlaying.value) {
+        rotationController.repeat();
+      } else {
+        rotationController.stop();
+      }
     });
+  }
+
+  @override
+  void onClose() {
+    rotationController.dispose();
+    super.onClose();
   }
 
   Future<void> playSong(int id, {bool needPlay = true}) async {
@@ -121,4 +142,10 @@ class PositionData {
     required this.bufferedPosition,
     required this.duration,
   });
+}
+
+// PlayerService继承自GetxController, 不是TickerProvider, 不能用vsync: this, 需要定义一个独立的TickerProvider
+class _StandaloneTickerProvider implements TickerProvider {
+  @override
+  Ticker createTicker(TickerCallback onTick) => Ticker(onTick);
 }

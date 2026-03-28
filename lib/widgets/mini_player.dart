@@ -17,6 +17,11 @@ class _MiniPlayerState extends State<MiniPlayer> {
   final _player = Get.find<PlayerService>();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
       final song = _player.song.value;
@@ -57,12 +62,14 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 contentPadding: const EdgeInsets.only(left: 15, right: 5),
                 leading: Hero(
                   tag: "song_image",
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: NeteaseImage(
-                      url: song.picUrl,
-                      width: 35,
-                      height: 35,
+                  child: RotationTransition(
+                    turns: _player.rotationController,
+                    child: ClipOval(
+                      child: NeteaseImage(
+                        url: song.picUrl,
+                        width: 35,
+                        height: 35,
+                      ),
                     ),
                   ),
                 ),
