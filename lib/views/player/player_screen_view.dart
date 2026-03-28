@@ -22,6 +22,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
     super.initState();
     _player.playSong(
       Get.arguments?['id'] ?? 0,
+      Get.arguments?['list'] ?? [],
       needPlay: Get.arguments?['needPlay'] ?? true,
     ); // 播放歌曲
   }
@@ -174,9 +175,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                           color: AppColors.textPrimary40,
                           fontSize: 13,
                         ),
-                        onSeek: (duration) {
-                          _player.seek(duration);
-                        },
+                        onSeek: _player.seek,
                       );
                     },
                   ),
@@ -200,6 +199,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                       IconButton(
                         onPressed: () {
                           print("播放上一首");
+                          _player.previous();
                         },
                         icon: Icon(
                           Icons.skip_previous,
@@ -228,6 +228,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                       IconButton(
                         onPressed: () {
                           print("播放下一首");
+                          _player.next();
                         },
                         icon: Icon(
                           Icons.skip_next,

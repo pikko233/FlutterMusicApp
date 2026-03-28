@@ -107,7 +107,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _player.next();
+                      },
                       icon: Icon(
                         Icons.skip_next,
                         color: AppColors.textSecondary,

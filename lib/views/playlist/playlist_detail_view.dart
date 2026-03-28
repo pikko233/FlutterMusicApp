@@ -340,7 +340,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                               // 如果音乐有版权，则跳转播放播放
                               Get.toNamed(
                                 AppRoutes.playerScreen,
-                                arguments: {'id': item.id},
+                                arguments: {'id': item.id, 'list': songList},
                               );
                             }
                           },
