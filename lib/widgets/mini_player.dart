@@ -44,7 +44,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
             Material(
               color: AppColors.bgElevated,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(25),
               ),
               clipBehavior: Clip.antiAlias,
               child: ListTile(
@@ -59,7 +59,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 },
                 dense: true,
                 visualDensity: VisualDensity.compact,
-                contentPadding: const EdgeInsets.only(left: 15, right: 5),
+                contentPadding: const EdgeInsets.only(left: 10, right: 5),
                 leading: Hero(
                   tag: "song_image",
                   child: RotationTransition(
@@ -124,7 +124,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
             // 播放进度条
             IgnorePointer(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: StreamBuilder<PositionData>(
                   stream: _player.positionDataStream,
                   builder: (context, snapshot) {

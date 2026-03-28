@@ -114,26 +114,28 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                           ),
                           const SizedBox(height: 4),
                           // 歌单简介
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _descExpanded = !_descExpanded;
-                              });
-                            },
-                            child: Text(
-                              playlist.description,
-                              maxLines: _descExpanded ? null : 2,
-                              overflow: _descExpanded
-                                  ? TextOverflow.visible
-                                  : TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: AppColors.textPrimary40,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+                          playlist.description.isEmpty
+                              ? const SizedBox.shrink()
+                              : GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _descExpanded = !_descExpanded;
+                                    });
+                                  },
+                                  child: Text(
+                                    playlist.description,
+                                    maxLines: _descExpanded ? null : 2,
+                                    overflow: _descExpanded
+                                        ? TextOverflow.visible
+                                        : TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary40,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
                           // 播放全部、随机播放按钮
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -283,6 +285,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       ),
                     ),
                   ),
+                  // 列表标题
                   SliverPadding(
                     padding: const EdgeInsets.only(
                       top: 10,
@@ -327,7 +330,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                         final item = songList[index];
                         return PlaylistSongCell(
                           index: index,
-                          image: item.al.picUrl,
+                          image: item.picUrl,
                           title: item.name,
                           subtitle:
                               "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",

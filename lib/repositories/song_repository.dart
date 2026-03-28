@@ -16,7 +16,9 @@ class SongRepository {
     print('音乐是否可用api: $res');
     if (!res.data['success']) {
       // 没有版权
-      Get.snackbar(res.data['message'], '试试换一首歌吧～');
+      if (!Get.isSnackbarOpen) {
+        Get.snackbar(res.data['message'], '试试换一首歌吧～');
+      }
     }
     return res.data['success'];
   }

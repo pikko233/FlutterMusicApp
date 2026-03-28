@@ -13,8 +13,8 @@ class Request {
         )
         ..interceptors.addAll([
           LogInterceptor(
-            requestBody: true,
-            responseBody: true,
+            requestBody: false,
+            responseBody: false,
           ), // 打印请求信息和响应信息，方便调试
           InterceptorsWrapper(
             onRequest: (options, handler) => handler.next(options),

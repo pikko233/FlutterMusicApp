@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_music_app/models/playlist_song_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:get/get.dart' hide Rx;
 
@@ -19,11 +20,19 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
-  final currentIndex = 0.obs; // 当前播放歌曲位于播放列表中的索引
-  final playlist = <dynamic>[].obs; // 当前播放列表, 列表api不返回音频资源url字段
+  int _skipCount = 0; // 记录因为无版权而跳到下一首歌的次数，如果跳过次数大于等于playlist长度，则停止播放
+
+  final playlist = <SongModel>[].obs; // 当前播放列表, 列表api不返回音频资源url字段
   final loopMode = LoopMode.all.obs; // 当前循环模式
 
-  late AnimationController rotationController; // 歌曲封面图片旋转动画控制
+  late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
+
+  late final Worker _songIdWorker;
+
+  // 当前播放歌曲位于播放列表中的索引
+  int get currentIndex => playlist.isEmpty
+      ? 0
+      : playlist.indexWhere((item) => item.id == currentSongId.value);
 
   Stream<PlayerState> get playerStateStream => _audioPlayer.playerStateStream;
 
@@ -83,18 +92,30 @@ class PlayerService extends GetxController {
     _audioPlayer.loopModeStream.listen((mode) {
       loopMode.value = mode;
     });
+
+    // 监听当前歌曲ID是否发生变化，如果变化则调整播放列表，保证当前歌曲始终在列表第一位
+    _songIdWorker = ever(currentSongId, (_) {
+      print('当前播放歌曲ID发生变化: ${currentSongId.value}');
+      final newList = [
+        ...playlist.sublist(currentIndex),
+        ...playlist.sublist(0, currentIndex),
+      ];
+      playlist.assignAll(newList);
+    });
   }
 
   @override
   void onClose() {
     rotationController.dispose();
+    _songIdWorker.disposed;
+    _audioPlayer.dispose();
     super.onClose();
   }
 
   // 点击列表中的某一首歌
   Future<void> playSong(
     int id,
-    List<dynamic> list, {
+    List<SongModel> list, {
     bool needPlay = true,
   }) async {
     if (currentSongId.value == id) {
@@ -109,12 +130,10 @@ class PlayerService extends GetxController {
       isLoading.value = true;
       isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
       if (!isAvailable.value) return; // 没有版权就返回
+      playlist.value = [...list];
       currentSongId.value = id;
       await _getSongDetail(id); // 获取歌曲信息
       await _getSongUrl(id); // 获取歌曲音频资源url
-      playlist.value = list;
-      print("播放列表: $playlist");
-      currentIndex.value = list.indexWhere((item) => item.id == id);
     } catch (e) {
       print(e);
     } finally {
@@ -167,40 +186,55 @@ class PlayerService extends GetxController {
   // 切换歌曲循环模式
   void toggleLoopMode() {
     final modes = [LoopMode.off, LoopMode.one, LoopMode.all];
-    final currentIndex = modes.indexOf(_audioPlayer.loopMode);
-    final nextIndex = (currentIndex + 1) % modes.length;
+    final currentModeIndex = modes.indexOf(_audioPlayer.loopMode);
+    final nextIndex = (currentModeIndex + 1) % modes.length;
     _audioPlayer.setLoopMode(modes[nextIndex]);
   }
 
   // 播放指定索引的歌曲
   Future<void> playAt(int index) async {
-    print(playlist[index]);
-    final id = playlist[index].id;
-    isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
-    if (!isAvailable.value) {
-      // 没有版权就播放下一首
-      next();
+    try {
+      isLoading.value = true;
+      final id = playlist[index].id;
+      isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
+      if (!isAvailable.value) {
+        // 没有版权就跳过这首，然后播放下一首
+        _skipNext(index);
+        return;
+      }
+      currentSongId.value = id;
+      await _getSongDetail(id);
+      await _getSongUrl(id);
+      _skipCount = 0; // 播放成功时归零
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void _skipNext(int index) {
+    _skipCount++;
+    if (_skipCount >= playlist.length) {
+      // 播放失败跳过的次数大于等于播放列表长度
+      print('播放列表所有歌曲都无版权，停止播放');
       return;
     }
-    currentSongId.value = id;
-    await _getSongDetail(id);
-    await _getSongUrl(id);
+    final nextIndex = (index + 1) % playlist.length;
+    playAt(nextIndex);
   }
 
   // 播放下一首
   void next() {
-    currentIndex.value = currentIndex.value == playlist.length - 1
-        ? 0
-        : currentIndex.value + 1;
-    playAt(currentIndex.value);
+    final nextIndex = (currentIndex + 1) % playlist.length;
+    playAt(nextIndex);
   }
 
   // 播放上一首
   void previous() {
-    currentIndex.value = currentIndex.value == 0
-        ? playlist.length - 1
-        : currentIndex.value - 1;
-    playAt(currentIndex.value);
+    final previousIndex =
+        (currentIndex - 1 + playlist.length) % playlist.length;
+    playAt(previousIndex);
   }
 }
 

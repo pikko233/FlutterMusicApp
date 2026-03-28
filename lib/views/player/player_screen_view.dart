@@ -4,6 +4,7 @@ import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:flutter_music_app/widgets/playlist_bottom_sheet.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -68,7 +69,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
               ),
             ),
             child: Obx(() {
-              if (_player.isLoading.value) {
+              if (_player.song.value == null) {
                 return Center(child: CircularProgressIndicator());
               }
               final song = _player.song.value;
@@ -184,7 +185,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // 播放模式切换按钮
+                      // TODO 播放模式切换按钮
                       IconButton(
                         onPressed: () {
                           print("切换播放模式");
@@ -195,10 +196,9 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                           size: 20,
                         ),
                       ),
-                      // 上一首
+                      // 播放上一首
                       IconButton(
                         onPressed: () {
-                          print("播放上一首");
                           _player.previous();
                         },
                         icon: Icon(
@@ -224,10 +224,9 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                           minimumSize: const Size(80, 80),
                         ),
                       ),
-                      // 下一首
+                      // 播放下一首
                       IconButton(
                         onPressed: () {
-                          print("播放下一首");
                           _player.next();
                         },
                         icon: Icon(
@@ -236,10 +235,18 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                           size: 40,
                         ),
                       ),
-                      // 弹出当前播放列表
+                      // 点击弹出当前播放列表
                       IconButton(
                         onPressed: () {
-                          print("弹出当前播放列表");
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => PlaylistBottomSheet(
+                              currentIndex: _player.currentIndex,
+                              playlist: _player.playlist,
+                              onPressed: (index) => _player.playAt(index),
+                            ),
+                          );
                         },
                         icon: Icon(
                           Icons.format_list_bulleted,

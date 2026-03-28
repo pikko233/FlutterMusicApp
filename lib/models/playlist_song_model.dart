@@ -20,6 +20,8 @@ class PlaylistSongModel {
     required this.fee,
   });
 
+  String get picUrl => al.picUrl;
+
   String get singersName => ar.map((e) => e.name).join(' / ');
 
   PlaylistSongModel copyWith({
