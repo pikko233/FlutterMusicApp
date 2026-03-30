@@ -32,31 +32,55 @@ class PlaylistBottomSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                "播放列表 (${playlist.length}首歌)",
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
             Expanded(
-              child: ListView.builder(
-                itemCount: playlist.length,
-                itemBuilder: (context, index) {
-                  final song = playlist[index];
-                  return PlaylistSongCell(
-                    index: index,
-                    image: song.picUrl,
-                    title: song.name,
-                    subtitle: song.singersName,
-                    onPressedPlay: () => onPressed(index),
-                    onPressedMore: () {},
-                  );
-                },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 15,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "播放列表",
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          "${playlist.length}",
+                          style: TextStyle(
+                            color: AppColors.textPrimary80,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: playlist.length,
+                      itemBuilder: (context, index) {
+                        final song = playlist[index];
+                        return PlaylistSongCell(
+                          index: index,
+                          image: song.picUrl,
+                          title: song.name,
+                          subtitle: song.singersName,
+                          onPressedPlay: () => onPressed(index),
+                          onPressedMore: () {},
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

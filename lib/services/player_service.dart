@@ -1,9 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:ffi';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_music_app/models/playlist_song_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:get/get.dart' hide Rx;
 
@@ -20,10 +18,17 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
+  LoopMode _loopMode = LoopMode.all; // 当前歌曲播放循环模式
+  final loopModeIcon = Rxn<IconData>(Icons.repeat); // 循环模式icon
+  final Map<LoopMode, IconData> _loopModeIconMap = {
+    LoopMode.off: Icons.sync_alt,
+    LoopMode.one: Icons.repeat_one,
+    LoopMode.all: Icons.repeat,
+  };
+
   int _skipCount = 0; // 记录因为无版权而跳到下一首歌的次数，如果跳过次数大于等于playlist长度，则停止播放
 
   final playlist = <SongModel>[].obs; // 当前播放列表, 列表api不返回音频资源url字段
-  final loopMode = LoopMode.all.obs; // 当前循环模式
 
   late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
 
@@ -81,21 +86,32 @@ class PlayerService extends GetxController {
     });
 
     // 监听当前播放进度
-    _audioPlayer.processingStateStream.listen((state) {
+    _audioPlayer.processingStateStream.listen((state) async {
       if (state == ProcessingState.completed) {
-        // 播放完毕则自动播放下一首
-        next();
+        if (_loopMode == LoopMode.off) {
+          // 播完暂停
+          // 如果当前是列表的最后一首，则暂停
+          if (currentIndex == playlist.length - 1) return;
+          // 否则继续播放下一首
+          next();
+        } else if (_loopMode == LoopMode.one) {
+          // 单曲循环
+          await seek(Duration.zero);
+          play();
+        } else if (_loopMode == LoopMode.all) {
+          // 循环播放
+          next();
+        }
       }
-    });
-
-    // 监听当前歌曲循环模式
-    _audioPlayer.loopModeStream.listen((mode) {
-      loopMode.value = mode;
     });
 
     // 监听当前歌曲ID是否发生变化，如果变化则调整播放列表，保证当前歌曲始终在列表第一位
     _songIdWorker = ever(currentSongId, (_) {
+      // 如果当前循环模式为播完暂停，那么就不改变播放列表playlist
+      if (_loopMode == LoopMode.off) return;
+
       print('当前播放歌曲ID发生变化: ${currentSongId.value}');
+      // 每次当前播放歌曲改变，都将当前歌曲改为播放列表第一位，前面的歌曲则整体移至列表最后
       final newList = [
         ...playlist.sublist(currentIndex),
         ...playlist.sublist(0, currentIndex),
@@ -107,7 +123,7 @@ class PlayerService extends GetxController {
   @override
   void onClose() {
     rotationController.dispose();
-    _songIdWorker.disposed;
+    _songIdWorker.dispose();
     _audioPlayer.dispose();
     super.onClose();
   }
@@ -162,33 +178,41 @@ class PlayerService extends GetxController {
   }
 
   // 播放歌曲
-  void play() {
+  Future<void> play() async {
     if (isCompleted) {
-      // 如果当前歌曲播放完毕，则从头开始播放
-      // _audioPlayer.seek(Duration(milliseconds: 0));
-      // 如果当前歌曲播放完毕，则自动播放下一首
-      next();
+      // 当前歌曲播放完毕
+      // 判断循环模式
+      if (_loopMode == LoopMode.one) {
+        // 如果是单曲循环，则从头开始播放
+        await seek(Duration.zero);
+        _audioPlayer.play();
+      } else {
+        // 如果是循环播放或者播完暂停，则直接播放下一首歌
+        next();
+      }
     } else {
+      // 当前歌曲未播放完毕
       _audioPlayer.play();
     }
   }
 
   // 暂停歌曲
-  void pause() {
-    _audioPlayer.pause();
+  Future<void> pause() async {
+    await _audioPlayer.pause();
   }
 
   // 跳转歌曲进度条
-  void seek(Duration position) {
-    _audioPlayer.seek(position);
+  Future<void> seek(Duration position) async {
+    await _audioPlayer.seek(position);
   }
 
   // 切换歌曲循环模式
   void toggleLoopMode() {
     final modes = [LoopMode.off, LoopMode.one, LoopMode.all];
-    final currentModeIndex = modes.indexOf(_audioPlayer.loopMode);
+    final currentModeIndex = modes.indexOf(_loopMode);
     final nextIndex = (currentModeIndex + 1) % modes.length;
-    _audioPlayer.setLoopMode(modes[nextIndex]);
+    _loopMode = modes[nextIndex];
+    loopModeIcon.value = _loopModeIconMap[_loopMode];
   }
 
   // 播放指定索引的歌曲

@@ -127,7 +127,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                 ),
                               ),
                             ),
-                            // const SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             SizedBox(
                               height: 20,
                               child: CustomMarquee(
@@ -188,10 +188,10 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                       // TODO 播放模式切换按钮
                       IconButton(
                         onPressed: () {
-                          print("切换播放模式");
+                          _player.toggleLoopMode();
                         },
                         icon: Icon(
-                          Icons.sync_alt,
+                          _player.loopModeIcon.value,
                           color: AppColors.textSecondary,
                           size: 20,
                         ),
