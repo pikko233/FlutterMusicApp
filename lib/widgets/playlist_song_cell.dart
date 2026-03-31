@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:flutter_music_app/widgets/song_popup_menu.dart';
 
 class PlaylistSongCell extends StatelessWidget {
   final int index;
   final bool isPlaying;
-  final String image;
-  final String title;
-  final String subtitle;
+  final SongModel song;
+  // final String image;
+  // final String title;
+  // final String subtitle;
   final VoidCallback onPressedPlay;
-  final VoidCallback onPressedMore;
   const PlaylistSongCell({
     super.key,
     this.isPlaying = false,
     required this.index,
-    required this.image,
-    required this.title,
-    required this.subtitle,
+    required this.song,
     required this.onPressedPlay,
-    required this.onPressedMore,
   });
 
   @override
@@ -47,13 +46,13 @@ class PlaylistSongCell extends StatelessWidget {
               child: Text(
                 "${index + 1}",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textHint, fontSize: 13),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
               ),
             ),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: NeteaseImage(
-                url: image,
+                url: song.picUrl,
                 width: 40,
                 height: 40,
                 fit: BoxFit.cover,
@@ -66,7 +65,7 @@ class PlaylistSongCell extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                title,
+                song.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -79,7 +78,7 @@ class PlaylistSongCell extends StatelessWidget {
           ],
         ),
         subtitle: Text(
-          subtitle,
+          song.singersName,
           maxLines: 1,
           style: TextStyle(
             color: AppColors.textPrimary60,
@@ -87,10 +86,7 @@ class PlaylistSongCell extends StatelessWidget {
             fontWeight: FontWeight.w400,
           ),
         ),
-        trailing: IconButton(
-          onPressed: onPressedMore,
-          icon: Icon(Icons.more_horiz, color: AppColors.textPrimary40),
-        ),
+        trailing: SongPopupMenu(song: song),
       ),
     );
   }

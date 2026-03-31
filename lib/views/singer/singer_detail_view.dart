@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
 import 'package:get/get.dart';
@@ -196,14 +197,18 @@ class _SingerDetailViewState extends State<SingerDetailView> {
                   sliver: SliverList.separated(
                     itemCount: 20,
                     itemBuilder: (context, index) {
-                      return PlaylistSongCell(
-                        index: index,
-                        image: "assets/images/ar_4.png",
-                        title: "晴天",
-                        subtitle: "周杰伦 • 4:29",
-                        onPressedPlay: () {},
-                        onPressedMore: () {},
+                      return ListTile(
+                        // TODO 需要补一下PlaylistSongCell
+                        title: Text('先占位，后面再补'),
                       );
+                      // return PlaylistSongCell(
+                      //   index: index,
+                      //   song: SongModel(id: 1, name: name, ar: ar, al: al, dt: dt),
+                      //   // image: "assets/images/ar_4.png",
+                      //   // title: "晴天",
+                      //   // subtitle: "周杰伦 • 4:29",
+                      //   onPressedPlay: () {},
+                      // );
                     },
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 10),

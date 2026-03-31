@@ -1,5 +1,6 @@
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/utils/request.dart';
+import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart';
 
 class SongRepository {
@@ -16,9 +17,10 @@ class SongRepository {
     print('音乐是否可用api: $res');
     if (!res.data['success']) {
       // 没有版权
-      if (!Get.isSnackbarOpen) {
-        Get.snackbar(res.data['message'], '试试换一首歌吧～');
-      }
+      ToastUtil.showToast(res.data['message']);
+      // if (!Get.isSnackbarOpen) {
+      //   Get.snackbar(res.data['message'], '试试换一首歌吧～');
+      // }
     }
     return res.data['success'];
   }

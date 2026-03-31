@@ -260,6 +260,23 @@ class PlayerService extends GetxController {
         (currentIndex - 1 + playlist.length) % playlist.length;
     playAt(previousIndex);
   }
+
+  // 添加至下一首播放
+  void addToNextPlay(SongModel song) {
+    // 先判断添加的歌曲是否已经在当前播放列表中
+    final index = playlist.indexWhere((item) => item.id == song.id);
+
+    // 如果已经在播放列表中
+    if (index != -1) {
+      // 如果是当前播放歌曲，则返回，不做任何操作
+      if (index == currentIndex) return;
+      // 从播放列表中移除
+      playlist.removeAt(index);
+    }
+
+    // 插入到当前播放歌曲索引的下一位
+    playlist.insert(currentIndex + 1, song);
+  }
 }
 
 class PositionData {

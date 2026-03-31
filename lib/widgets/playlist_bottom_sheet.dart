@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
 import 'package:get/state_manager.dart';
 
@@ -71,11 +70,8 @@ class PlaylistBottomSheet extends StatelessWidget {
                         final song = playlist[index];
                         return PlaylistSongCell(
                           index: index,
-                          image: song.picUrl,
-                          title: song.name,
-                          subtitle: song.singersName,
+                          song: song,
                           onPressedPlay: () => onPressed(index),
-                          onPressedMore: () {},
                         );
                       },
                     ),

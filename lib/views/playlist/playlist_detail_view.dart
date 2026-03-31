@@ -330,10 +330,11 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                         final item = songList[index];
                         return PlaylistSongCell(
                           index: index,
-                          image: item.picUrl,
-                          title: item.name,
-                          subtitle:
-                              "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
+                          song: item,
+                          // image: item.picUrl,
+                          // title: item.name,
+                          // subtitle:
+                          //     "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                           onPressedPlay: () async {
                             // 先判断一下音乐是否有版权
                             final isAvailable = await _player.checkSong(
@@ -347,7 +348,6 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                               );
                             }
                           },
-                          onPressedMore: () {},
                         );
                       },
                       separatorBuilder: (context, index) =>
