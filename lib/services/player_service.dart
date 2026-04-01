@@ -33,8 +33,6 @@ class PlayerService extends GetxController {
 
   late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
 
-  late final Worker _songIdWorker;
-
   // 当前播放歌曲位于播放列表中的索引
   int get currentIndex => playlist.isEmpty
       ? 0
@@ -73,6 +71,13 @@ class PlayerService extends GetxController {
       duration: Duration(seconds: 30),
     );
 
+    ever(currentSongId, (_) {
+      rotationController.reset(); // 归零
+      if (isPlaying.value) {
+        rotationController.repeat(); // 开始旋转
+      }
+    });
+
     // 监听播放状态流，判断当前是否在播放歌曲
     _audioPlayer.playerStateStream.listen((state) {
       isPlaying.value =
@@ -105,26 +110,11 @@ class PlayerService extends GetxController {
         }
       }
     });
-
-    // 监听当前歌曲ID是否发生变化，如果变化则调整播放列表，保证当前歌曲始终在列表第一位
-    _songIdWorker = ever(currentSongId, (_) {
-      // 如果当前循环模式为播完暂停，那么就不改变播放列表playlist
-      if (_loopMode == LoopMode.off) return;
-
-      print('当前播放歌曲ID发生变化: ${currentSongId.value}');
-      // 每次当前播放歌曲改变，都将当前歌曲改为播放列表第一位，前面的歌曲则整体移至列表最后
-      final newList = [
-        ...playlist.sublist(currentIndex),
-        ...playlist.sublist(0, currentIndex),
-      ];
-      playlist.assignAll(newList);
-    });
   }
 
   @override
   void onClose() {
     rotationController.dispose();
-    _songIdWorker.dispose();
     _audioPlayer.dispose();
     super.onClose();
   }
@@ -283,7 +273,7 @@ class PlayerService extends GetxController {
   // 从播放列表中移除
   void removeFromPlaylist(int songId) {
     final index = playlist.indexWhere((item) => item.id == songId);
-    if (index == -1) {
+    if (index != -1) {
       ToastUtil.showToast('播放列表中不存在这首歌');
       return;
     }

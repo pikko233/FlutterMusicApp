@@ -61,7 +61,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 visualDensity: VisualDensity.compact,
                 contentPadding: const EdgeInsets.only(left: 10, right: 5),
                 leading: Hero(
-                  tag: "song_image",
+                  tag: "playing_song_image_${_player.currentSongId.value}",
                   child: RotationTransition(
                     turns: _player.rotationController,
                     child: ClipOval(

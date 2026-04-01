@@ -1,7 +1,6 @@
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/utils/request.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
-import 'package:get/get.dart';
 
 class SongRepository {
   // 获取歌曲详情
@@ -14,7 +13,7 @@ class SongRepository {
   // 音乐是否可用（是否有版权）
   static Future<bool> checkSong(int id) async {
     final res = await Request.get('/check/music', params: {'id': id});
-    print('音乐是否可用api: $res');
+    // print('音乐是否可用api: $res');
     if (!res.data['success']) {
       // 没有版权
       ToastUtil.showToast(res.data['message']);
@@ -33,7 +32,7 @@ class SongRepository {
       '/song/url/v1',
       params: {'id': id, 'level': level},
     );
-    print('获取音乐URL: $res');
+    // print('获取音乐URL: $res');
     return res.data['data'][0]['url'];
   }
 }
