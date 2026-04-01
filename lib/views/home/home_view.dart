@@ -92,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               children: [
                 // 今日推荐
-                SectionTitle(title: "推荐歌单", onPressed: () {}),
+                // SectionTitle(title: "推荐歌单", onPressed: () {}),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),

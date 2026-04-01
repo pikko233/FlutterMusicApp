@@ -77,7 +77,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       ),
                     ],
                   ),
-                  // 歌单封面、歌单简介、播放全部按钮、随机播放按钮
+                  // 歌单封面、歌单简介、播放全部按钮、收藏歌单按钮
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: SliverToBoxAdapter(
@@ -145,7 +145,12 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     clipBehavior: Clip.antiAlias,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      _player.playSong(
+                                        _playlistDetailVM.songList[0].id,
+                                        _playlistDetailVM.songList,
+                                      );
+                                    },
                                     icon: Icon(
                                       Icons.play_arrow,
                                       color: AppColors.textPrimary,
@@ -171,11 +176,11 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                   child: ElevatedButton.icon(
                                     onPressed: () {},
                                     icon: Icon(
-                                      Icons.sync_alt,
+                                      Icons.add_box_outlined,
                                       color: AppColors.primary,
                                     ),
                                     label: Text(
-                                      "随机播放",
+                                      "收藏歌单",
                                       style: TextStyle(
                                         color: AppColors.primary,
                                         fontSize: 13,
