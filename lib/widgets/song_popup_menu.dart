@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/services/player_service.dart';
-import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart';
 
 class SongPopupMenu extends StatelessWidget {
@@ -12,11 +11,11 @@ class SongPopupMenu extends StatelessWidget {
   final _player = Get.find<PlayerService>();
 
   // 点击菜单按钮的映射
-  final Map<MenuButton, int> _map = {
+  final Map<MenuButton, int> _buttonValueMap = {
     MenuButton.toggleFavorite: 1, // 添加至喜欢/取消喜欢
     MenuButton.addToPlaylist: 2, // 添加至歌单
     MenuButton.playNext: 3, // 下一首播放
-    MenuButton.deleteFromPlaylist: 4, // 从播放列表删除
+    MenuButton.removeFromPlaylist: 4, // 从播放列表删除
   };
 
   @override
@@ -25,7 +24,7 @@ class SongPopupMenu extends StatelessWidget {
       color: AppColors.bgElevated,
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: _map[MenuButton.toggleFavorite],
+          value: _buttonValueMap[MenuButton.toggleFavorite],
           child: MenuItem(
             title: '添加至我喜欢',
             icon: Icon(Icons.favorite_border, color: Color(0xFFEC4899)),
@@ -38,7 +37,7 @@ class SongPopupMenu extends StatelessWidget {
           endIndent: 10,
         ),
         PopupMenuItem(
-          value: _map[MenuButton.addToPlaylist],
+          value: _buttonValueMap[MenuButton.addToPlaylist],
           child: MenuItem(
             title: '添加至歌单',
             icon: Icon(Icons.add_box_outlined, color: Colors.white),
@@ -53,9 +52,8 @@ class SongPopupMenu extends StatelessWidget {
         PopupMenuItem(
           onTap: () {
             _player.addToNextPlay(song);
-            ToastUtil.showToast('添加成功');
           },
-          value: _map[MenuButton.playNext],
+          value: _buttonValueMap[MenuButton.playNext],
           child: MenuItem(
             title: '下一首播放',
             icon: Icon(Icons.skip_next, color: Colors.white),
@@ -69,11 +67,11 @@ class SongPopupMenu extends StatelessWidget {
         ),
         PopupMenuItem(
           onTap: () {
-            print('从播放列表中删除');
+            _player.removeFromPlaylist(song.id);
           },
-          value: _map[MenuButton.deleteFromPlaylist],
+          value: _buttonValueMap[MenuButton.removeFromPlaylist],
           child: MenuItem(
-            title: '从播放列表中删除',
+            title: '从播放列表移除',
             icon: Icon(
               Icons.delete_forever,
               color: Color.fromARGB(255, 236, 72, 99),
@@ -86,7 +84,7 @@ class SongPopupMenu extends StatelessWidget {
 }
 
 // 定义菜单按钮的枚举变量
-enum MenuButton { toggleFavorite, addToPlaylist, playNext, deleteFromPlaylist }
+enum MenuButton { toggleFavorite, addToPlaylist, playNext, removeFromPlaylist }
 
 // 菜单的单个按钮项
 class MenuItem extends StatelessWidget {

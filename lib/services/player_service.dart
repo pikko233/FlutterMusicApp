@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart' hide Rx;
 
 import 'package:flutter_music_app/repositories/song_repository.dart';
@@ -276,6 +277,18 @@ class PlayerService extends GetxController {
 
     // 插入到当前播放歌曲索引的下一位
     playlist.insert(currentIndex + 1, song);
+    ToastUtil.showToast('添加成功');
+  }
+
+  // 从播放列表中移除
+  void removeFromPlaylist(int songId) {
+    final index = playlist.indexWhere((item) => item.id == songId);
+    if (index == -1) {
+      ToastUtil.showToast('播放列表中不存在这首歌');
+      return;
+    }
+    playlist.removeAt(index);
+    ToastUtil.showToast('移除成功');
   }
 }
 
