@@ -61,7 +61,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 visualDensity: VisualDensity.compact,
                 contentPadding: const EdgeInsets.only(left: 10, right: 5),
                 leading: Hero(
-                  tag: "playing_song_image_${_player.currentSongId.value}",
+                  tag: "playing_song_image_${song.id}",
                   child: RotationTransition(
                     turns: _player.rotationController,
                     child: ClipOval(
@@ -76,6 +76,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 title: Text(
                   song.name,
                   maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 13,
@@ -84,6 +85,8 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 ),
                 subtitle: Text(
                   song.singersName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textPrimary60,
                     fontSize: 11,

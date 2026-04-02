@@ -1,7 +1,11 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lyric/core/lyric_style.dart';
+import 'package:flutter_lyric/core/lyric_styles.dart';
+import 'package:flutter_lyric/widgets/lyric_view.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/constants/app_lyric.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
@@ -20,6 +24,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
   final PlayerService _player = Get.find<PlayerService>();
   final _carouselController = CarouselSliderController();
   late final Worker _carouselWorker;
+  bool _showLyric = false; // 是否显示歌词
 
   @override
   void initState() {
@@ -89,51 +94,174 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                 return Center(child: CircularProgressIndicator());
               }
               final song = _player.song.value!;
+
               return Column(
                 children: [
                   Expanded(
-                    child:
-                        // 歌曲封面图片 - 轮播图
-                        CarouselSlider.builder(
-                          carouselController: _carouselController,
-                          itemCount: _player.playlist.length,
-                          itemBuilder: (context, itemIndex, pageViewIndex) {
-                            return Hero(
-                              tag:
-                                  'playing_song_image_${_player.currentSongId.value}',
-                              child: RotationTransition(
-                                turns: _player.rotationController,
-                                child: ClipOval(
-                                  child: NeteaseImage(
-                                    url: _player.playlist[itemIndex].picUrl,
-                                    width: media.width * 0.6,
-                                    height: media.width * 0.6,
+                    child: AnimatedSwitcher(
+                      // 切换歌曲封面图片和歌词的时候添加淡入淡出效果
+                      duration: Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) =>
+                          FadeTransition(opacity: animation, child: child),
+                      child: _showLyric
+                          ? Column(
+                              children: [
+                                Expanded(
+                                  child: LyricView(
+                                    // 歌词
+                                    controller: _player.lyricController,
+                                    style: AppLyric.playerScreenLyricStyle,
+                                    width: double.infinity,
+                                    height: double.infinity,
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                          options: CarouselOptions(
-                            height: media.width * 0.6,
-                            aspectRatio: 1 / 1,
-                            viewportFraction: 1,
-                            initialPage: _player.currentIndex,
-                            enableInfiniteScroll: false,
-                            reverse: false,
-                            autoPlay: false,
-                            enlargeCenterPage: true,
-                            enlargeFactor: 0.3,
-                            enlargeStrategy:
-                                CenterPageEnlargeStrategy.zoom, // 景深效果
-                            scrollDirection: Axis.horizontal,
-                            onPageChanged: (index, reason) {
-                              if (reason == CarouselPageChangedReason.manual) {
-                                // 只有手动切换轮播图才触发，点击播放上一首/下一首 - 控制器切换page不触发该事件
-                                _player.playAt(index); // 滑动轮播图切换歌曲
-                              }
-                            },
-                          ),
-                        ),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    setState(() {
+                                      _showLyric = false;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: AppColors.textPrimary60,
+                                  ),
+                                  label: Text(
+                                    '隐藏歌词',
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary60,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _showLyric = true;
+                                      });
+                                    },
+                                    child: CarouselSlider.builder(
+                                      // 歌曲封面轮播图 - 可左右滑动切换歌曲
+                                      carouselController: _carouselController,
+                                      itemCount: _player.playlist.length,
+                                      itemBuilder:
+                                          (context, itemIndex, pageViewIndex) {
+                                            return Hero(
+                                              tag:
+                                                  'playing_song_image_${_player.playlist[itemIndex].id}',
+                                              child: RotationTransition(
+                                                turns:
+                                                    _player.rotationController,
+                                                child: ClipOval(
+                                                  child: NeteaseImage(
+                                                    url: _player
+                                                        .playlist[itemIndex]
+                                                        .picUrl,
+                                                    width: media.width * 0.6,
+                                                    height: media.width * 0.6,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                      options: CarouselOptions(
+                                        height: media.width * 0.6,
+                                        aspectRatio: 1 / 1,
+                                        viewportFraction: 1,
+                                        initialPage: _player.currentIndex,
+                                        enableInfiniteScroll: true,
+                                        reverse: false,
+                                        autoPlay: false,
+                                        enlargeCenterPage: true,
+                                        enlargeFactor: 0.3,
+                                        enlargeStrategy:
+                                            CenterPageEnlargeStrategy
+                                                .zoom, // 景深效果
+                                        scrollDirection: Axis.horizontal,
+                                        onPageChanged: (index, reason) {
+                                          if (reason ==
+                                              CarouselPageChangedReason
+                                                  .manual) {
+                                            // 只有手动切换轮播图才触发，点击播放上一首/下一首 - 控制器切换page不触发该事件
+                                            _player.playAt(index); // 滑动轮播图切换歌曲
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // 添加至喜欢按钮、歌曲名称、歌手、添加至歌单按钮
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // 爱心按钮
+                                      IconButton(
+                                        onPressed: () {
+                                          print("添加至我的喜欢歌单");
+                                        },
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: Color(0xFFEC4899),
+                                        ),
+                                      ),
+                                      // 歌曲名称、专辑、歌手
+                                      Expanded(
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 28,
+                                              child: CustomMarquee(
+                                                text: song.name,
+                                                style: TextStyle(
+                                                  color: AppColors.textPrimary,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            SizedBox(
+                                              height: 20,
+                                              child: CustomMarquee(
+                                                text:
+                                                    "${song.name} • ${song.singersName}",
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.textSecondary,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // 添加至歌单
+                                      IconButton(
+                                        onPressed: () {
+                                          print("添加至歌单");
+                                        },
+                                        icon: Icon(
+                                          Icons.add_box,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -142,66 +270,6 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                     ),
                     child: Column(
                       children: [
-                        // 添加至喜欢按钮、歌曲名称、歌手、添加至歌单按钮
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // 爱心按钮
-                            IconButton(
-                              onPressed: () {
-                                print("添加至我的喜欢歌单");
-                              },
-                              icon: Icon(
-                                Icons.favorite,
-                                color: Color(0xFFEC4899),
-                                size: 20,
-                              ),
-                            ),
-                            // 歌曲名称、专辑、歌手
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 28,
-                                    child: CustomMarquee(
-                                      text: song.name,
-                                      style: TextStyle(
-                                        color: AppColors.textPrimary,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  SizedBox(
-                                    height: 20,
-                                    child: CustomMarquee(
-                                      text:
-                                          "${song.al.name} • ${song.singersName}",
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // 添加至歌单
-                            IconButton(
-                              onPressed: () {
-                                print("添加至歌单");
-                              },
-                              icon: Icon(
-                                Icons.add_box,
-                                color: AppColors.textSecondary,
-                                size: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
                         // 音频进度条
                         StreamBuilder<PositionData>(
                           stream: _player.positionDataStream,

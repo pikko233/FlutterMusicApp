@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_lyric/flutter_lyric.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart' hide Rx;
@@ -32,6 +33,8 @@ class PlayerService extends GetxController {
   final playlist = <SongModel>[].obs; // 当前播放列表, 列表api不返回音频资源url字段
 
   late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
+
+  late final LyricController lyricController; // 歌词控制器
 
   // 当前播放歌曲位于播放列表中的索引
   int get currentIndex => playlist.isEmpty
@@ -70,6 +73,12 @@ class PlayerService extends GetxController {
       vsync: _StandaloneTickerProvider(),
       duration: Duration(seconds: 30),
     );
+
+    // 点击某一行歌词跳转对应歌曲进度
+    lyricController = LyricController()
+      ..setOnTapLineCallback((duration) {
+        seek(duration);
+      });
 
     ever(currentSongId, (_) {
       rotationController.reset(); // 归零
@@ -110,11 +119,15 @@ class PlayerService extends GetxController {
         }
       }
     });
+
+    // 监听歌曲播放进度 - 驱动歌词滚动
+    _audioPlayer.positionStream.listen(lyricController.setProgress);
   }
 
   @override
   void onClose() {
     rotationController.dispose();
+    lyricController.dispose();
     _audioPlayer.dispose();
     super.onClose();
   }
@@ -141,6 +154,7 @@ class PlayerService extends GetxController {
       currentSongId.value = id;
       await _getSongDetail(id); // 获取歌曲信息
       await _getSongUrl(id); // 获取歌曲音频资源url
+      await _getSongLyric(id); // 获取歌曲歌词
     } catch (e) {
       print(e);
     } finally {
@@ -166,6 +180,27 @@ class PlayerService extends GetxController {
     songUrl.value = res as String?;
     await _audioPlayer.setUrl(songUrl.value!);
     play();
+  }
+
+  // 获取歌曲逐字歌词
+  Future<void> _getSongLyric(int id) async {
+    final res = await SongRepository.getSongLyric(id);
+    final lyric = _filterEmptyLines(res['lrc']['lyric']);
+    final tlyric = _filterEmptyLines(res['tlyric']['lyric']);
+    lyricController.loadLyric(lyric, translationLyric: tlyric);
+  }
+
+  // 过滤歌词为空的字符串行
+  String _filterEmptyLines(String lrc) {
+    return lrc
+        .split('\n')
+        .where((line) {
+          // 只保留有歌词文本的行（时间戳后面有内容）
+          final match = RegExp(r'^\[\d{2}:\d{2}\.\d+\](.+)$').firstMatch(line);
+          return line.trimLeft().startsWith('{') ||
+              match != null && match.group(1)!.trim().isNotEmpty;
+        })
+        .join('\n');
   }
 
   // 播放歌曲
@@ -220,6 +255,7 @@ class PlayerService extends GetxController {
       currentSongId.value = id;
       await _getSongDetail(id);
       await _getSongUrl(id);
+      await _getSongLyric(id); // 获取歌曲歌词
       _skipCount = 0; // 播放成功时归零
     } catch (e) {
       print(e);
