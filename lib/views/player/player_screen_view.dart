@@ -1,8 +1,6 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_lyric/core/lyric_style.dart';
-import 'package:flutter_lyric/core/lyric_styles.dart';
 import 'package:flutter_lyric/widgets/lyric_view.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_lyric.dart';
@@ -105,6 +103,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                           FadeTransition(opacity: animation, child: child),
                       child: _showLyric
                           ? Column(
+                              key: const ValueKey('lyric'),
                               children: [
                                 Expanded(
                                   child: LyricView(
@@ -137,6 +136,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                               ],
                             )
                           : Column(
+                              key: const ValueKey('cover'),
                               children: [
                                 Expanded(
                                   child: GestureDetector(
