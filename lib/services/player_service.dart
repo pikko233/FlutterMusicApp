@@ -77,10 +77,18 @@ class PlayerService extends GetxController {
     // 点击某一行歌词跳转对应歌曲进度
     lyricController = LyricController()
       ..setOnTapLineCallback((duration) {
-        seek(duration);
+        // seek(duration);
+      })
+      ..registerEvent(LyricEvent.stopSelection, (_) {
+        // 用户开始拖拽，可展示“回到当前行”按钮
+        print('用户拖拽歌词');
+      })
+      ..registerEvent(LyricEvent.resumeSelectedLine, (_) {
+        // 恢复自动跟随
+        print('恢复自动跟随');
       });
 
-    ever(currentSongId, (_) {
+    ever(song, (_) {
       rotationController.reset(); // 归零
       if (isPlaying.value) {
         rotationController.repeat(); // 开始旋转
@@ -186,21 +194,19 @@ class PlayerService extends GetxController {
   Future<void> _getSongLyric(int id) async {
     final res = await SongRepository.getSongLyric(id);
     final lyric = _filterEmptyLines(res['lrc']['lyric']);
-    final tlyric = _filterEmptyLines(res['tlyric']['lyric']);
+    final tlyric = res['tlyric']?['lyric'] ?? '';
     lyricController.loadLyric(lyric, translationLyric: tlyric);
   }
 
   // 过滤歌词为空的字符串行
   String _filterEmptyLines(String lrc) {
-    return lrc
-        .split('\n')
-        .where((line) {
-          // 只保留有歌词文本的行（时间戳后面有内容）
-          final match = RegExp(r'^\[\d{2}:\d{2}\.\d+\](.+)$').firstMatch(line);
-          return line.trimLeft().startsWith('{') ||
-              match != null && match.group(1)!.trim().isNotEmpty;
-        })
-        .join('\n');
+    final lines = lrc.split('\n').where((line) {
+      // 只保留标准 LRC 格式且时间戳后面有内容的行
+      final match = RegExp(r'^\[\d{2}:\d{2}\.\d+\](.+)$').firstMatch(line);
+      return match != null && match.group(1)!.trim().isNotEmpty;
+    }).toList();
+    if (lines.isEmpty) return '[00:00.000]该歌曲暂无歌词';
+    return lines.join('\n');
   }
 
   // 播放歌曲

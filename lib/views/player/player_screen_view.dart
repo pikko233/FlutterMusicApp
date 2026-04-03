@@ -23,22 +23,38 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
   final _carouselController = CarouselSliderController();
   late final Worker _carouselWorker;
   bool _showLyric = false; // 是否显示歌词
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
+
+    _carouselWorker = ever(_player.song, (_) {
+      // song 变化时 UI 已渲染出 CarouselSlider，controller 此时可用
+      if (_player.song.value == null) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final diff = (_player.currentIndex - _currentPage).abs();
+        if (diff <= 1 || diff == _player.playlist.length - 1) {
+          // 如果点击的歌曲索引相邻，使用动画跳转
+          _carouselController.animateToPage(
+            _player.currentIndex,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        } else {
+          _carouselController.jumpToPage(_player.currentIndex);
+        }
+        _currentPage = _player.currentIndex;
+      });
+    });
+
     _player.playSong(
       Get.arguments?['id'] ?? 0,
       Get.arguments?['list'] ?? [],
       needPlay: Get.arguments?['needPlay'] ?? true,
     ); // 播放歌曲
 
-    _carouselWorker = ever(_player.currentSongId, (_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // 延迟到帧渲染完成后再执行
-        _carouselController.jumpToPage(_player.currentIndex);
-      });
-    });
+    _currentPage = _player.currentIndex;
   }
 
   @override
@@ -50,50 +66,50 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.sizeOf(context);
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.bgAppBar,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary60),
-        ),
-        title: Text(
-          "正在播放",
-          style: TextStyle(
-            color: AppColors.textPrimary60,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.more_horiz, color: AppColors.textPrimary60),
-          ),
-        ],
-      ),
-      body: StreamBuilder<PlayerState>(
-        stream: _player.playerStateStream,
-        builder: (context, snapshot) {
-          final isPlaying = _player.isPlaying.value; // 当前歌曲正在播放 且 未播放完毕
-          return Container(
-            // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.bgPrimary, AppColors.bgAppBar],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-              ),
-            ),
-            child: Obx(() {
-              if (_player.song.value == null) {
-                return Center(child: CircularProgressIndicator());
-              }
-              final song = _player.song.value!;
+    return Obx(() {
+      if (_player.song.value == null) {
+        return Center(child: CircularProgressIndicator());
+      }
+      final song = _player.song.value!;
 
-              return Column(
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.bgAppBar,
+          leading: IconButton(
+            onPressed: () {
+              Get.back();
+            },
+            icon: Icon(Icons.arrow_back, color: AppColors.textPrimary60),
+          ),
+          title: Text(
+            _showLyric ? song.name : "正在播放",
+            style: TextStyle(
+              color: AppColors.textPrimary60,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.more_horiz, color: AppColors.textPrimary60),
+            ),
+          ],
+        ),
+        body: StreamBuilder<PlayerState>(
+          stream: _player.playerStateStream,
+          builder: (context, snapshot) {
+            final isPlaying = _player.isPlaying.value; // 当前歌曲正在播放 且 未播放完毕
+            return Container(
+              // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.bgPrimary, AppColors.bgAppBar],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
+              ),
+              child: Column(
                 children: [
                   Expanded(
                     child: AnimatedSwitcher(
@@ -106,31 +122,29 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                               key: const ValueKey('lyric'),
                               children: [
                                 Expanded(
-                                  child: LyricView(
-                                    // 歌词
-                                    controller: _player.lyricController,
-                                    style: AppLyric.playerScreenLyricStyle,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                  ),
-                                ),
-                                TextButton.icon(
-                                  onPressed: () {
-                                    setState(() {
-                                      _showLyric = false;
-                                    });
-                                  },
-                                  icon: Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: AppColors.textPrimary60,
-                                  ),
-                                  label: Text(
-                                    '隐藏歌词',
-                                    style: TextStyle(
-                                      color: AppColors.textPrimary60,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                  child: Stack(
+                                    children: [
+                                      LyricView(
+                                        // 歌词
+                                        controller: _player.lyricController,
+                                        style: AppLyric.playerScreenLyricStyle,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                      ),
+                                      Positioned.fill(
+                                        // 点击隐藏歌词
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior
+                                              .translucent, // 透明穿透
+                                          onTap: () {
+                                            setState(() {
+                                              _showLyric = false;
+                                            });
+                                          },
+                                          child: const SizedBox.expand(),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -151,17 +165,16 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                       itemCount: _player.playlist.length,
                                       itemBuilder:
                                           (context, itemIndex, pageViewIndex) {
+                                            final itemSong =
+                                                _player.playlist[itemIndex];
                                             return Hero(
-                                              tag:
-                                                  'playing_song_image_${_player.playlist[itemIndex].id}',
+                                              tag: 'cover_${itemSong.id}',
                                               child: RotationTransition(
                                                 turns:
                                                     _player.rotationController,
                                                 child: ClipOval(
                                                   child: NeteaseImage(
-                                                    url: _player
-                                                        .playlist[itemIndex]
-                                                        .picUrl,
+                                                    url: itemSong.picUrl,
                                                     width: media.width * 0.6,
                                                     height: media.width * 0.6,
                                                   ),
@@ -184,6 +197,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                                 .zoom, // 景深效果
                                         scrollDirection: Axis.horizontal,
                                         onPageChanged: (index, reason) {
+                                          _currentPage = index;
                                           if (reason ==
                                               CarouselPageChangedReason
                                                   .manual) {
@@ -418,11 +432,12 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                     ),
                   ),
                 ],
-              );
-            }),
-          );
-        },
-      ),
-    );
+              ),
+              // obxxxxxxx
+            );
+          },
+        ),
+      );
+    }); // scaffoldddddd
   }
 }
