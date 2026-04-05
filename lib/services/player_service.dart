@@ -99,6 +99,13 @@ class PlayerService extends GetxController {
       if (isPlaying.value) {
         rotationController.repeat(); // 开始旋转
       }
+
+      // 判断当前歌曲是否是最后一首
+      if (currentIndex == playlist.length - 1) {
+        // 加载下一页歌曲列表
+        print('加载下一页歌曲列表');
+        loadMore();
+      }
     });
 
     // 监听播放状态流，判断当前是否在播放歌曲
@@ -180,7 +187,7 @@ class PlayerService extends GetxController {
     }
   }
 
-  // 传入歌单id
+  // 加载歌单中的下一页歌曲列表
   Future<void> loadMore() async {
     if (playlist.length >= songTotalCount.value) return;
     try {
