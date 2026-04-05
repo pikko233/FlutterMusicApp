@@ -1,4 +1,5 @@
 import 'package:flutter_music_app/models/high_quality_playlist_model.dart';
+import 'package:flutter_music_app/models/high_quality_playlist_tag_model.dart';
 import 'package:flutter_music_app/models/playlist_model.dart';
 import 'package:flutter_music_app/models/recommend_playlist_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
@@ -46,9 +47,11 @@ class PlaylistRepository {
   }
 
   // 精品歌单标签列表
-  static Future<dynamic> getHighQualityTags() async {
+  static Future<List<HighQualityPlaylistTagModel>> getHighQualityTags() async {
     final res = await Request.get('/playlist/highquality/tags');
-    return res.data;
+    return (res.data['tags'] as List)
+        .map((e) => HighQualityPlaylistTagModel.fromMap(e))
+        .toList();
   }
 
   // 获取精品歌单

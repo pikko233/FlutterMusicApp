@@ -81,18 +81,18 @@ class PlayerService extends GetxController {
     );
 
     // 点击某一行歌词跳转对应歌曲进度
-    lyricController = LyricController()
-      ..setOnTapLineCallback((duration) {
-        // seek(duration);
-      })
-      ..registerEvent(LyricEvent.stopSelection, (_) {
-        // 用户开始拖拽，可展示“回到当前行”按钮
-        print('用户拖拽歌词');
-      })
-      ..registerEvent(LyricEvent.resumeSelectedLine, (_) {
-        // 恢复自动跟随
-        print('恢复自动跟随');
-      });
+    lyricController = LyricController();
+    // ..setOnTapLineCallback((duration) {
+    //   // seek(duration);
+    // })
+    // ..registerEvent(LyricEvent.stopSelection, (_) {
+    //   // 用户开始拖拽，可展示“回到当前行”按钮
+    //   print('用户拖拽歌词');
+    // })
+    // ..registerEvent(LyricEvent.resumeSelectedLine, (_) {
+    //   // 恢复自动跟随
+    //   print('恢复自动跟随');
+    // });
 
     ever(song, (_) {
       rotationController.reset(); // 归零
@@ -100,8 +100,8 @@ class PlayerService extends GetxController {
         rotationController.repeat(); // 开始旋转
       }
 
-      // 判断当前歌曲是否是最后一首
-      if (currentIndex == playlist.length - 1) {
+      // 判断当前歌曲是否是播放列表最后几首
+      if (currentIndex == (playlist.length - 3).clamp(0, playlist.length - 3)) {
         // 加载下一页歌曲列表
         print('加载下一页歌曲列表');
         loadMore();

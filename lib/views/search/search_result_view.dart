@@ -4,7 +4,6 @@ import 'package:flutter_music_app/views/search/tabViews/search_playlist_list.dar
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_album_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_singer_list.dart';
-import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_song_list.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +20,6 @@ class _SearchResultViewState extends State<SearchResultView>
   final TextEditingController _searchController =
       TextEditingController(); // 搜索框控制器
   late TabController _tabController;
-  var _isPlayingIndex = 0;
 
   List<Widget> get _tabs {
     return const [

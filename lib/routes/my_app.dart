@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/constants/app_theme.dart';
-import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/views/main/main_view.dart';
 import 'package:flutter_music_app/views/player/player_screen_view.dart';
+import 'package:flutter_music_app/views/playlist/high_quality_playlist_view.dart';
 import 'package:flutter_music_app/views/playlist/playlist_detail_view.dart';
 import 'package:flutter_music_app/views/search/search_result_view.dart';
 import 'package:flutter_music_app/views/singer/singer_detail_view.dart';
@@ -38,6 +38,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: AppRoutes.playerScreen,
           page: () => const PlayerScreenView(),
+        ),
+        GetPage(
+          name: AppRoutes.highQualityPlaylist,
+          page: () => const HighQualityPlaylistView(),
         ),
       ],
     );

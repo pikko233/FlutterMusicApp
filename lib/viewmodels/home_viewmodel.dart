@@ -18,9 +18,8 @@ class HomeViewmodel extends GetxController {
     try {
       isLoading.value = true;
       Future.wait([
-        getRecommendPlaylist(),
-        getHighQualityTags(),
-        getHighQualityPlaylist(0),
+        _getRecommendPlaylist(),
+        _getHighQualityPlaylist(0, limit: 30),
       ]);
     } catch (e) {
       print(e);
@@ -30,19 +29,13 @@ class HomeViewmodel extends GetxController {
   }
 
   // 获取推荐歌单
-  Future<void> getRecommendPlaylist() async {
+  Future<void> _getRecommendPlaylist() async {
     final res = await PlaylistRepository.getRecommendPlaylist(limit: 30);
     recommendPlaylist.value = res;
   }
 
-  // 获取精品歌单标签
-  Future<void> getHighQualityTags() async {
-    final res = await PlaylistRepository.getHighQualityTags();
-    print('精品标签: $res');
-  }
-
   // 获取精品歌单
-  Future<void> getHighQualityPlaylist(
+  Future<void> _getHighQualityPlaylist(
     int before, {
     String? cat,
     int limit = 50,

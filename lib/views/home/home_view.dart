@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:flutter_music_app/viewmodels/home_viewmodel.dart';
 import 'package:flutter_music_app/widgets/search_song_cell.dart';
@@ -128,7 +129,12 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
                 // 精品歌单
-                SectionTitle(title: "精品歌单", onPressed: () {}),
+                SectionTitle(
+                  title: "精品歌单",
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.highQualityPlaylist);
+                  },
+                ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
