@@ -3,7 +3,6 @@ import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
-import 'package:flutter_music_app/utils/time_util.dart';
 import 'package:flutter_music_app/viewmodels/playlist_detail_viewmodel.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
@@ -18,6 +17,7 @@ class PlaylistDetailView extends StatefulWidget {
 }
 
 class _PlaylistDetailViewState extends State<PlaylistDetailView> {
+  final _scrollController = ScrollController();
   late PlaylistDetailViewmodel _playlistDetailVM;
   bool _descExpanded = false; // 是否展开歌单简介
   final _player = Get.find<PlayerService>();
@@ -29,6 +29,18 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
     _playlistDetailVM = Get.put(
       PlaylistDetailViewmodel(id: Get.arguments['id'] ?? 0),
     );
+
+    // 监听页面滚动
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 100) {
+        if (!_playlistDetailVM.hasMore || _playlistDetailVM.isLoading.value) {
+          return;
+        }
+        // 触底加载更多歌曲
+        _playlistDetailVM.loadMore();
+      }
+    });
   }
 
   @override
@@ -46,12 +58,14 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
         child: Stack(
           children: [
             Obx(() {
-              if (_playlistDetailVM.isLoading.value) {
+              if (_playlistDetailVM.songList.isEmpty ||
+                  _playlistDetailVM.playlistDetail.value == null) {
                 return const Center(child: CircularProgressIndicator());
               }
               final playlist = _playlistDetailVM.playlistDetail.value!;
               final songList = _playlistDetailVM.songList;
               return CustomScrollView(
+                controller: _scrollController,
                 slivers: [
                   SliverAppBar(
                     pinned: true,
@@ -149,6 +163,10 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                       _player.playSong(
                                         _playlistDetailVM.songList[0].id,
                                         _playlistDetailVM.songList,
+                                        _playlistDetailVM
+                                            .playlistDetail
+                                            .value!
+                                            .trackCount,
                                       );
                                     },
                                     icon: Icon(
@@ -349,7 +367,14 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                               // 如果音乐有版权，则跳转播放播放
                               Get.toNamed(
                                 AppRoutes.playerScreen,
-                                arguments: {'id': item.id, 'list': songList},
+                                arguments: {
+                                  'id': item.id,
+                                  'list': songList,
+                                  'total': _playlistDetailVM
+                                      .playlistDetail
+                                      .value!
+                                      .trackCount,
+                                },
                               );
                             }
                           },

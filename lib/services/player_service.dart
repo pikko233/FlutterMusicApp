@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_lyric/flutter_lyric.dart';
 import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/repositories/playlist_repository.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart' hide Rx;
 
 import 'package:flutter_music_app/repositories/song_repository.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart';
 
 class PlayerService extends GetxController {
@@ -20,6 +22,9 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
+  final playlist =
+      <SongModel>[].obs; // 当前播放列表（分页加载，可能不包含所有歌）, 列表api不返回音频资源url字段
+  final songTotalCount = 0.obs; // 播放列表歌曲总数（包含所有分页）
   LoopMode _loopMode = LoopMode.all; // 当前歌曲播放循环模式
   final loopModeIcon = Rxn<IconData>(Icons.repeat); // 循环模式icon
   final Map<LoopMode, IconData> _loopModeIconMap = {
@@ -28,9 +33,9 @@ class PlayerService extends GetxController {
     LoopMode.all: Icons.repeat,
   };
 
-  int _skipCount = 0; // 记录因为无版权而跳到下一首歌的次数，如果跳过次数大于等于playlist长度，则停止播放
+  bool get hasMore => playlist.length < songTotalCount.value;
 
-  final playlist = <SongModel>[].obs; // 当前播放列表, 列表api不返回音频资源url字段
+  int _skipCount = 0; // 记录因为无版权而跳到下一首歌的次数，如果跳过次数大于等于playlist长度，则停止播放
 
   late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
 
@@ -143,26 +148,46 @@ class PlayerService extends GetxController {
   // 点击列表中的某一首歌
   Future<void> playSong(
     int id,
-    List<SongModel> list, {
+    List<SongModel> list,
+    int total, {
     bool needPlay = true,
   }) async {
-    if (currentSongId.value == id) {
-      // 如果点击的是同一首歌，后面逻辑不执行
-      if (needPlay) {
-        // 从歌单列表点击来就播放，从miniplayer迷你播放器点进来不自动播放
-        play();
-      }
-      return;
-    }
     try {
       isLoading.value = true;
       isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
       if (!isAvailable.value) return; // 没有版权就返回
       playlist.value = [...list];
+      songTotalCount.value = total;
+      if (currentSongId.value == id) {
+        // 如果点击的是同一首歌，后面逻辑不执行
+        if (needPlay) {
+          // 从歌单列表点击来就播放，从miniplayer迷你播放器点进来不自动播放
+          play();
+        }
+        return;
+      }
       currentSongId.value = id;
       await _getSongDetail(id); // 获取歌曲信息
       await _getSongUrl(id); // 获取歌曲音频资源url
       await _getSongLyric(id); // 获取歌曲歌词
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // 传入歌单id
+  Future<void> loadMore(int id) async {
+    if (playlist.length >= songTotalCount.value) return;
+    try {
+      isLoading.value = true;
+      final res = await PlaylistRepository.getSongsInPlaylist(
+        id,
+        limit: 50,
+        offset: playlist.length,
+      );
+      playlist.addAll(res);
     } catch (e) {
       print(e);
     } finally {
@@ -186,7 +211,19 @@ class PlayerService extends GetxController {
   Future<void> _getSongUrl(int id) async {
     final res = await SongRepository.getSongUrl(id, level: 'higher');
     songUrl.value = res as String?;
-    await _audioPlayer.setUrl(songUrl.value!);
+    // await _audioPlayer.setUrl(songUrl.value!);
+    await _audioPlayer.setAudioSource(
+      AudioSource.uri(
+        Uri.parse(songUrl.value!),
+        tag: MediaItem(
+          id: currentSongId.value.toString(),
+          title: song.value!.name,
+          artist: song.value!.singersName,
+          artUri: Uri.parse(song.value!.picUrl),
+        ),
+      ),
+      preload: true,
+    );
     play();
   }
 

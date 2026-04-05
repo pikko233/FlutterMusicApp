@@ -17,9 +17,6 @@ class SongRepository {
     if (!res.data['success']) {
       // 没有版权
       ToastUtil.showToast(res.data['message']);
-      // if (!Get.isSnackbarOpen) {
-      //   Get.snackbar(res.data['message'], '试试换一首歌吧～');
-      // }
     }
     return res.data['success'];
   }
@@ -32,8 +29,21 @@ class SongRepository {
       '/song/url/v1',
       params: {'id': id, 'level': level},
     );
-    // print('获取音乐URL: $res');
+    print('获取音乐URL: $res');
     return res.data['data'][0]['url'];
+  }
+
+  // 传入多个id，获取多个歌曲url
+  static Future<List<dynamic>> getAllSongUrl(
+    List<int> ids, {
+    String level = 'standard',
+  }) async {
+    final res = await Request.get(
+      '/song/url/v1',
+      params: {'id': ids.join(','), 'level': level},
+    );
+    print('获取所有音乐的URL: $res');
+    return res.data['data'];
   }
 
   // 获取歌曲逐字歌词

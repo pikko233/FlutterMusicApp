@@ -15,14 +15,10 @@ class HomeViewmodel extends GetxController {
   Future<void> getRecommendPlaylist() async {
     try {
       isLoading.value = true;
-      final res = await PlaylistRepository.getRecommendPlaylist(limit: 80);
-      print('res length: ${res.length}');
-      print('res: $res');
+      final res = await PlaylistRepository.getRecommendPlaylist(limit: 30);
       recommendPlaylist.value = res;
-      print('recommendPlaylist length: ${recommendPlaylist.length}');
-    } catch (e, stack) {
-      print('error: $e');
-      print('stack: $stack');
+    } catch (e) {
+      print(e);
     } finally {
       isLoading.value = false;
     }

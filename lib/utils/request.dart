@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_music_app/constants/app_config.dart';
 
 class Request {
   static final _dio =
       Dio(
           BaseOptions(
-            baseUrl: "http://localhost:3000",
+            baseUrl: AppConfig.baseUrl,
             sendTimeout: const Duration(milliseconds: 10000),
             connectTimeout: const Duration(milliseconds: 10000),
             receiveTimeout: const Duration(milliseconds: 10000),
@@ -13,8 +14,8 @@ class Request {
         )
         ..interceptors.addAll([
           // LogInterceptor(
-          //   requestBody: false,
-          //   responseBody: false,
+          //   requestBody: true,
+          //   responseBody: true,
           // ), // 打印请求信息和响应信息，方便调试
           InterceptorsWrapper(
             onRequest: (options, handler) => handler.next(options),

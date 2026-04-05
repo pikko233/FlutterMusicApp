@@ -1,18 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
+import 'package:get/get_instance/get_instance.dart';
 import 'package:get/state_manager.dart';
 
-class PlaylistBottomSheet extends StatelessWidget {
+class PlaylistBottomSheet extends StatefulWidget {
   final int currentIndex; // 当前播放歌曲的索引
-  final List playlist; // 播放列表
+  final List playlist; // 播放列表（分页加载部分的歌曲）
+  final int total; // 播放列表歌曲总数（包含分页未加载完的歌曲）
   final Function(int index) onPressed; // 点击播放
+  final VoidCallback onScrollBottom; // 滚动触底事件
   const PlaylistBottomSheet({
     super.key,
     required this.currentIndex,
     required this.playlist,
+    required this.total,
     required this.onPressed,
+    required this.onScrollBottom,
   });
+
+  @override
+  State<PlaylistBottomSheet> createState() => _PlaylistBottomSheetState();
+}
+
+class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 100) {
+        widget.onScrollBottom();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +77,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "${playlist.length}",
+                          "${widget.total}",
                           style: TextStyle(
                             color: AppColors.textPrimary80,
                             fontSize: 10,
@@ -65,13 +89,14 @@ class PlaylistBottomSheet extends StatelessWidget {
                   ),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: playlist.length,
+                      controller: _scrollController,
+                      itemCount: widget.playlist.length,
                       itemBuilder: (context, index) {
-                        final song = playlist[index];
+                        final song = widget.playlist[index];
                         return PlaylistSongCell(
                           index: index,
                           song: song,
-                          onPressedPlay: () => onPressed(index),
+                          onPressedPlay: () => widget.onPressed(index),
                         );
                       },
                     ),

@@ -44,7 +44,8 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17 # 实现后台播放功能
   rxdart: ^0.28.0 # 合并数据流
   carousel_slider: ^5.1.2 # 实现左右切换歌曲的轮播图效果
-  flutter_lyric: ^3.0.2 #歌词滚动组件库
+  flutter_lyric: ^3.0.2 # 歌词滚动组件库
+  audio_session: ^0.2.3 # 创建音频会话，防止后台切断
 
 dev_dependencies:
   flutter_test:
