@@ -161,12 +161,10 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                     clipBehavior: Clip.antiAlias,
                                     onPressed: () {
                                       _player.playSong(
-                                        _playlistDetailVM.songList[0].id,
-                                        _playlistDetailVM.songList,
-                                        _playlistDetailVM
-                                            .playlistDetail
-                                            .value!
-                                            .trackCount,
+                                        songList[0].id,
+                                        songList,
+                                        playlist.trackCount,
+                                        playlist.id,
                                       );
                                     },
                                     icon: Icon(
@@ -365,17 +363,13 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                             );
                             if (isAvailable) {
                               // 如果音乐有版权，则跳转播放播放
-                              Get.toNamed(
-                                AppRoutes.playerScreen,
-                                arguments: {
-                                  'id': item.id,
-                                  'list': songList,
-                                  'total': _playlistDetailVM
-                                      .playlistDetail
-                                      .value!
-                                      .trackCount,
-                                },
+                              _player.playSong(
+                                item.id,
+                                songList,
+                                playlist.trackCount,
+                                playlist.id,
                               );
+                              Get.toNamed(AppRoutes.playerScreen);
                             }
                           },
                         );

@@ -22,6 +22,7 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
+  final playlistId = RxnInt(); // 当前歌单id，由于分页加载，所以需要存进来，播放到最后一首时加载下一页的请求需要传入该id
   final playlist =
       <SongModel>[].obs; // 当前播放列表（分页加载，可能不包含所有歌）, 列表api不返回音频资源url字段
   final songTotalCount = 0.obs; // 播放列表歌曲总数（包含所有分页）
@@ -149,7 +150,8 @@ class PlayerService extends GetxController {
   Future<void> playSong(
     int id,
     List<SongModel> list,
-    int total, {
+    int total,
+    int listId, {
     bool needPlay = true,
   }) async {
     try {
@@ -158,6 +160,7 @@ class PlayerService extends GetxController {
       if (!isAvailable.value) return; // 没有版权就返回
       playlist.value = [...list];
       songTotalCount.value = total;
+      playlistId.value = listId;
       if (currentSongId.value == id) {
         // 如果点击的是同一首歌，后面逻辑不执行
         if (needPlay) {
@@ -178,12 +181,12 @@ class PlayerService extends GetxController {
   }
 
   // 传入歌单id
-  Future<void> loadMore(int id) async {
+  Future<void> loadMore() async {
     if (playlist.length >= songTotalCount.value) return;
     try {
       isLoading.value = true;
       final res = await PlaylistRepository.getSongsInPlaylist(
-        id,
+        playlistId.value!,
         limit: 50,
         offset: playlist.length,
       );

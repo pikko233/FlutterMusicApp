@@ -5,7 +5,6 @@ import 'package:flutter_lyric/widgets/lyric_view.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_lyric.dart';
 import 'package:flutter_music_app/services/player_service.dart';
-import 'package:flutter_music_app/viewmodels/playlist_detail_viewmodel.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/playlist_bottom_sheet.dart';
@@ -21,7 +20,6 @@ class PlayerScreenView extends StatefulWidget {
 
 class _PlayerScreenViewState extends State<PlayerScreenView> {
   final _player = Get.find<PlayerService>();
-  final _playlistDetailVM = Get.find<PlaylistDetailViewmodel>();
   final _carouselController = CarouselSliderController();
   late final Worker _carouselWorker;
   bool _showLyric = false; // 是否显示歌词
@@ -49,13 +47,6 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
         _currentPage = _player.currentIndex;
       });
     });
-
-    _player.playSong(
-      Get.arguments?['id'] ?? 0,
-      Get.arguments?['list'] ?? [],
-      Get.arguments?['total'] ?? 0,
-      needPlay: Get.arguments?['needPlay'] ?? true,
-    ); // 播放歌曲
 
     _currentPage = _player.currentIndex;
   }
@@ -250,8 +241,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                             SizedBox(
                                               height: 20,
                                               child: CustomMarquee(
-                                                text:
-                                                    "${song.name} • ${song.singersName}",
+                                                text: song.singersName,
                                                 style: TextStyle(
                                                   color:
                                                       AppColors.textSecondary,
@@ -383,20 +373,12 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                   builder: (context) => PlaylistBottomSheet(
                                     currentIndex: _player.currentIndex,
                                     playlist: _player.playlist,
-                                    total: _playlistDetailVM
-                                        .playlistDetail
-                                        .value!
-                                        .trackCount,
+                                    total: _player.songTotalCount.value,
                                     onPressed: (index) => _player.playAt(index),
                                     onScrollBottom: () {
                                       if (_player.hasMore &&
                                           !_player.isLoading.value) {
-                                        _player.loadMore(
-                                          _playlistDetailVM
-                                              .playlistDetail
-                                              .value!
-                                              .id,
-                                        );
+                                        _player.loadMore();
                                       }
                                     },
                                   ),
