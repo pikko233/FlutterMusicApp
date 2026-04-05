@@ -1,6 +1,6 @@
+import 'package:flutter_music_app/models/high_quality_playlist_model.dart';
 import 'package:flutter_music_app/models/playlist_model.dart';
 import 'package:flutter_music_app/models/recommend_playlist_model.dart';
-import 'package:flutter_music_app/models/playlist_song_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/utils/request.dart';
 
@@ -42,6 +42,31 @@ class PlaylistRepository {
     );
     return (res.data['songs'] as List)
         .map((e) => SongModel.fromMap(e))
+        .toList();
+  }
+
+  // 精品歌单标签列表
+  static Future<dynamic> getHighQualityTags() async {
+    final res = await Request.get('/playlist/highquality/tags');
+    return res.data;
+  }
+
+  // 获取精品歌单
+  // 可选参数 : cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部",可从精品歌单标签列表接口获取(/playlist/highquality/tags)
+  // limit: 取出歌单数量 , 默认为 50
+  // before: 分页参数,取上一页最后一个歌单的 updateTime 获取
+  static Future<List<HighQualityPlaylistModel>> getHighQualityPlaylist(
+    int before, {
+    String? cat,
+    int limit = 50,
+  }) async {
+    final res = await Request.get(
+      '/top/playlist/highquality',
+      params: {'before': before, 'cat': cat, 'limit': limit},
+    );
+
+    return (res.data['playlists'] as List)
+        .map((e) => HighQualityPlaylistModel.fromMap(e))
         .toList();
   }
 }

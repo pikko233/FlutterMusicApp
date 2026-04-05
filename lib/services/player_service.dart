@@ -320,12 +320,14 @@ class PlayerService extends GetxController {
 
   // 播放下一首
   void next() {
+    if (playlist.isEmpty) return;
     final nextIndex = (currentIndex + 1) % playlist.length;
     playAt(nextIndex);
   }
 
   // 播放上一首
   void previous() {
+    if (playlist.isEmpty) return;
     final previousIndex =
         (currentIndex - 1 + playlist.length) % playlist.length;
     playAt(previousIndex);
