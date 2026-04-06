@@ -15,6 +15,8 @@ import 'package:rxdart/rxdart.dart';
 
 class PlayerService extends GetxController {
   late AudioPlayer _audioPlayer;
+  late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
+  late final LyricController lyricController; // 歌词控制器
 
   final isLoading = false.obs; // 是否发送请求加载中
   final isAvailable = false.obs; // 音乐是否可用（是否有版权）
@@ -33,14 +35,11 @@ class PlayerService extends GetxController {
     LoopMode.one: Icons.repeat_one,
     LoopMode.all: Icons.repeat,
   };
+  final volumn = 1.0.obs; // 播放器音量（非系统音量，ios不允许app直接修改系统音量）
 
   bool get hasMore => playlist.length < songTotalCount.value;
 
   int _skipCount = 0; // 记录因为无版权而跳到下一首歌的次数，如果跳过次数大于等于playlist长度，则停止播放
-
-  late final AnimationController rotationController; // 歌曲封面图片旋转动画控制
-
-  late final LyricController lyricController; // 歌词控制器
 
   // 当前播放歌曲位于播放列表中的索引
   int get currentIndex => playlist.isEmpty
@@ -80,19 +79,8 @@ class PlayerService extends GetxController {
       duration: Duration(seconds: 30),
     );
 
-    // 点击某一行歌词跳转对应歌曲进度
+    // 实例化歌词控制器
     lyricController = LyricController();
-    // ..setOnTapLineCallback((duration) {
-    //   // seek(duration);
-    // })
-    // ..registerEvent(LyricEvent.stopSelection, (_) {
-    //   // 用户开始拖拽，可展示“回到当前行”按钮
-    //   print('用户拖拽歌词');
-    // })
-    // ..registerEvent(LyricEvent.resumeSelectedLine, (_) {
-    //   // 恢复自动跟随
-    //   print('恢复自动跟随');
-    // });
 
     ever(song, (_) {
       rotationController.reset(); // 归零
@@ -240,19 +228,27 @@ class PlayerService extends GetxController {
   // 获取歌曲逐字歌词
   Future<void> _getSongLyric(int id) async {
     final res = await SongRepository.getSongLyric(id);
-    final lyric = _filterEmptyLines(res['lrc']['lyric']);
-    final tlyric = res['tlyric']?['lyric'] ?? '';
+    print('歌词: $res');
+    final lyric = _filterEmptyLines(
+      res['lrc']['lyric'] as String,
+      fallback: '[00:00.000]该歌曲暂无歌词',
+    );
+    final tlyric = _filterEmptyLines(res['tlyric']?['lyric'] as String?);
     lyricController.loadLyric(lyric, translationLyric: tlyric);
   }
 
   // 过滤歌词为空的字符串行
-  String _filterEmptyLines(String lrc) {
+  String _filterEmptyLines(String? lrc, {String fallback = ''}) {
+    if (lrc == null || lrc.trim().isEmpty) return fallback;
+    final timestampReg = RegExp(r'\[\d{2}:\d{2}\.\d+\]');
     final lines = lrc.split('\n').where((line) {
-      // 只保留标准 LRC 格式且时间戳后面有内容的行
-      final match = RegExp(r'^\[\d{2}:\d{2}\.\d+\](.+)$').firstMatch(line);
-      return match != null && match.group(1)!.trim().isNotEmpty;
+      // 必须包含至少一个时间戳
+      if (!timestampReg.hasMatch(line)) return false;
+      // 去掉所有时间戳后，剩余文本必须非空
+      final text = line.replaceAll(timestampReg, '').trim();
+      return text.isNotEmpty;
     }).toList();
-    if (lines.isEmpty) return '[00:00.000]该歌曲暂无歌词';
+    if (lines.isEmpty) return fallback;
     return lines.join('\n');
   }
 
@@ -370,6 +366,12 @@ class PlayerService extends GetxController {
     }
     playlist.removeAt(index);
     ToastUtil.showToast('移除成功');
+  }
+
+  // 设置播放器音量
+  Future<void> setVolumn(double value) async {
+    await _audioPlayer.setVolume(value);
+    volumn.value = value;
   }
 }
 

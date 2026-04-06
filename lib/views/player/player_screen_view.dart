@@ -150,8 +150,28 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
+                                        // 点击显示歌词
                                         _showLyric = true;
                                       });
+                                    },
+                                    onLongPress: () {
+                                      // 长按预览封面图
+                                      final item =
+                                          _player.playlist[_currentPage];
+                                      showDialog(
+                                        context: context,
+                                        barrierColor: Colors.black87,
+                                        builder: (ctx) => GestureDetector(
+                                          onTap: () => Navigator.pop(ctx),
+                                          child: Center(
+                                            child: NeteaseImage(
+                                              url: item.picUrl,
+                                              width: media.width,
+                                              height: media.width,
+                                            ),
+                                          ),
+                                        ),
+                                      );
                                     },
                                     child: CarouselSlider.builder(
                                       // 歌曲封面轮播图 - 可左右滑动切换歌曲
@@ -404,8 +424,10 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: ProgressBar(
-                                progress: Duration(milliseconds: 30000),
-                                total: Duration(milliseconds: 200000),
+                                progress: Duration(
+                                  milliseconds: (_player.volumn * 100).toInt(),
+                                ),
+                                total: Duration(milliseconds: 100),
                                 progressBarColor: AppColors.primary.withValues(
                                   alpha: 0.7,
                                 ),
@@ -417,9 +439,10 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                 barHeight: 4.0,
                                 thumbRadius: 20,
                                 timeLabelLocation: TimeLabelLocation.none,
-                                onSeek: (duration) {
-                                  // _player.seek(duration);
-                                  print("播放进度跳转至: $duration");
+                                onSeek: (duration) async {
+                                  final newVolumn =
+                                      duration.inMilliseconds / 100;
+                                  _player.setVolumn(newVolumn);
                                 },
                               ),
                             ),
