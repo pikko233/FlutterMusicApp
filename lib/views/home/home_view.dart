@@ -16,7 +16,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final homeVM = Get.put(HomeViewmodel());
+  final _homeVM = Get.put(HomeViewmodel());
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -93,35 +93,29 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               children: [
                 // 今日推荐
-                // SectionTitle(title: "推荐歌单", onPressed: () {}),
+                SectionTitle(title: "今日推荐", onPressed: () {}, showMore: false),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Obx(
-                    () => homeVM.recommendPlaylist.isEmpty
+                    () => _homeVM.recommendPlaylist.isEmpty
                         ? const SizedBox(
                             height: 160,
                             child: Center(child: CircularProgressIndicator()),
                           )
                         : Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 10,
                             children: List.generate(
-                              homeVM.recommendPlaylist.length,
+                              _homeVM.recommendPlaylist.length,
                               (index) {
-                                final item = homeVM.recommendPlaylist[index];
-                                return Padding(
-                                  padding:
-                                      index !=
-                                          homeVM.recommendPlaylist.length - 1
-                                      ? const EdgeInsets.only(right: 10)
-                                      : const EdgeInsets.all(0),
-                                  child: PlaylistCard(
-                                    id: item.id,
-                                    image: item.picUrl,
-                                    title: item.name,
-                                    subtitle:
-                                        '播放量 ${CountUtil.formatCount(item.playCount)}',
-                                  ),
+                                final item = _homeVM.recommendPlaylist[index];
+                                return PlaylistCard(
+                                  id: item.id,
+                                  image: item.picUrl,
+                                  title: item.name,
+                                  subtitle:
+                                      '播放量 ${CountUtil.formatCount(item.playCount)}',
                                 );
                               },
                             ),
@@ -139,29 +133,23 @@ class _HomeViewState extends State<HomeView> {
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   child: Obx(
-                    () => homeVM.highQualityPlaylist.isEmpty
+                    () => _homeVM.highQualityPlaylist.isEmpty
                         ? const SizedBox(
                             height: 160,
                             child: Center(child: CircularProgressIndicator()),
                           )
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 10,
                             children: List.generate(
-                              homeVM.highQualityPlaylist.length,
+                              _homeVM.highQualityPlaylist.length,
                               (index) {
-                                final item = homeVM.highQualityPlaylist[index];
-                                return Padding(
-                                  padding:
-                                      index !=
-                                          homeVM.highQualityPlaylist.length - 1
-                                      ? const EdgeInsets.only(right: 10)
-                                      : const EdgeInsets.all(0),
-                                  child: PlaylistCard(
-                                    id: item.id,
-                                    image: item.coverImgUrl,
-                                    title: item.name,
-                                    subtitle: item.tags.join(' '),
-                                  ),
+                                final item = _homeVM.highQualityPlaylist[index];
+                                return PlaylistCard(
+                                  id: item.id,
+                                  image: item.coverImgUrl,
+                                  title: item.name,
+                                  subtitle: item.tags.join(' '),
                                 );
                               },
                             ),
@@ -169,25 +157,31 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
                 // 排行榜
-                SectionTitle(title: "排行榜", onPressed: () {}),
+                SectionTitle(title: "排行榜", onPressed: () {}, showMore: false),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(5, (index) {
-                      return Padding(
-                        padding: index != 4
-                            ? const EdgeInsets.only(right: 10)
-                            : const EdgeInsets.all(0),
-                        child: PlaylistCard(
-                          id: 0,
-                          image: "assets/images/ar_2.png",
-                          title: "SongName",
-                          subtitle: "Singer",
-                        ),
-                      );
-                    }),
+                  child: Obx(
+                    () => _homeVM.toplist.isEmpty
+                        ? const SizedBox(
+                            height: 160,
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            spacing: 10,
+                            children: List.generate(_homeVM.toplist.length, (
+                              index,
+                            ) {
+                              final item = _homeVM.toplist[index];
+                              return PlaylistCard(
+                                id: item.id,
+                                image: item.coverImgUrl,
+                                title: item.name,
+                                subtitle: item.updateFrequency,
+                              );
+                            }),
+                          ),
                   ),
                 ),
                 // 最近播放

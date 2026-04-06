@@ -1,8 +1,9 @@
 import 'package:flutter_music_app/models/high_quality_playlist_model.dart';
-import 'package:flutter_music_app/models/high_quality_playlist_tag_model.dart';
+import 'package:flutter_music_app/models/high_quality_tag_model.dart';
 import 'package:flutter_music_app/models/playlist_model.dart';
 import 'package:flutter_music_app/models/recommend_playlist_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/models/toplist_model.dart';
 import 'package:flutter_music_app/utils/request.dart';
 
 class PlaylistRepository {
@@ -47,10 +48,10 @@ class PlaylistRepository {
   }
 
   // 精品歌单标签列表
-  static Future<List<HighQualityPlaylistTagModel>> getHighQualityTags() async {
+  static Future<List<HighQualityTagModel>> getHighQualityTags() async {
     final res = await Request.get('/playlist/highquality/tags');
     return (res.data['tags'] as List)
-        .map((e) => HighQualityPlaylistTagModel.fromMap(e))
+        .map((e) => HighQualityTagModel.fromMap(e))
         .toList();
   }
 
@@ -70,6 +71,14 @@ class PlaylistRepository {
 
     return (res.data['playlists'] as List)
         .map((e) => HighQualityPlaylistModel.fromMap(e))
+        .toList();
+  }
+
+  // 获取所有榜单（排行榜），排行榜详情用歌单详情的接口
+  static Future<List<ToplistModel>> getToplist() async {
+    final res = await Request.get('/toplist');
+    return (res.data['list'] as List)
+        .map((e) => ToplistModel.fromMap(e))
         .toList();
   }
 }

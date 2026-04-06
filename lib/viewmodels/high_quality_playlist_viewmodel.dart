@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:flutter/src/scheduler/ticker.dart';
 import 'package:flutter_music_app/models/high_quality_playlist_model.dart';
-import 'package:flutter_music_app/models/high_quality_playlist_tag_model.dart';
+import 'package:flutter_music_app/models/high_quality_tag_model.dart';
 import 'package:flutter_music_app/repositories/playlist_repository.dart';
 import 'package:get/get.dart';
 
 class HighQualityPlaylistViewmodel extends GetxController {
   final isLoading = false.obs;
-  final tags = <HighQualityPlaylistTagModel>[].obs; // 精品标签
+  final tags = <HighQualityTagModel>[].obs; // 精品标签
   final currentIndex = 0.obs; // 选中的精品标签索引
   final highQualityPlaylist = <HighQualityPlaylistModel>[].obs; // 精品歌单
   late final TabController tabController;
@@ -48,13 +48,7 @@ class HighQualityPlaylistViewmodel extends GetxController {
   Future<void> _getHighQualityTags() async {
     final res = await PlaylistRepository.getHighQualityTags();
     tags.add(
-      HighQualityPlaylistTagModel(
-        id: 0,
-        name: '全部',
-        type: 0,
-        category: 0,
-        hot: false,
-      ),
+      HighQualityTagModel(id: 0, name: '全部', type: 0, category: 0, hot: false),
     );
     tags.addAll(res);
   }

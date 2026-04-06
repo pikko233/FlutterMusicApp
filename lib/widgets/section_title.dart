@@ -25,14 +25,16 @@ class SectionTitle extends StatelessWidget {
             title,
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
             ),
           ),
           showMore
-              ? TextButton(
+              ? TextButton.icon(
+                  icon: Icon(Icons.chevron_right),
+                  iconAlignment: IconAlignment.end,
                   onPressed: onPressed,
-                  child: Text(
+                  label: Text(
                     showMoreLabel,
                     style: TextStyle(color: AppColors.primary, fontSize: 13),
                   ),

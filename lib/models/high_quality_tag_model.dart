@@ -1,13 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-class HighQualityPlaylistTagModel {
+class HighQualityTagModel {
   final int id;
   final String name;
   final int type;
   final int category;
   final bool hot;
-  HighQualityPlaylistTagModel({
+  HighQualityTagModel({
     required this.id,
     required this.name,
     required this.type,
@@ -15,14 +15,14 @@ class HighQualityPlaylistTagModel {
     required this.hot,
   });
 
-  HighQualityPlaylistTagModel copyWith({
+  HighQualityTagModel copyWith({
     int? id,
     String? name,
     int? type,
     int? category,
     bool? hot,
   }) {
-    return HighQualityPlaylistTagModel(
+    return HighQualityTagModel(
       id: id ?? this.id,
       name: name ?? this.name,
       type: type ?? this.type,
@@ -41,8 +41,8 @@ class HighQualityPlaylistTagModel {
     };
   }
 
-  factory HighQualityPlaylistTagModel.fromMap(Map<String, dynamic> map) {
-    return HighQualityPlaylistTagModel(
+  factory HighQualityTagModel.fromMap(Map<String, dynamic> map) {
+    return HighQualityTagModel(
       id: map['id'] as int,
       name: map['name'] as String,
       type: map['type'] as int,
@@ -53,18 +53,16 @@ class HighQualityPlaylistTagModel {
 
   String toJson() => json.encode(toMap());
 
-  factory HighQualityPlaylistTagModel.fromJson(String source) =>
-      HighQualityPlaylistTagModel.fromMap(
-        json.decode(source) as Map<String, dynamic>,
-      );
+  factory HighQualityTagModel.fromJson(String source) =>
+      HighQualityTagModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'HighQualityPlaylistTagModel(id: $id, name: $name, type: $type, category: $category, hot: $hot)';
+    return 'HighQualityTagModel(id: $id, name: $name, type: $type, category: $category, hot: $hot)';
   }
 
   @override
-  bool operator ==(covariant HighQualityPlaylistTagModel other) {
+  bool operator ==(covariant HighQualityTagModel other) {
     if (identical(this, other)) return true;
 
     return other.id == id &&
