@@ -72,6 +72,11 @@ class PlaylistDetailViewmodel extends GetxController {
     songList.value = res;
   }
 
+  // 为播放器提供的分页加载回调
+  Future<List<SongModel>> loadMoreSongsForPlayer(int offset) {
+    return PlaylistRepository.getSongsInPlaylist(id, limit: 50, offset: offset);
+  }
+
   Future<void> _getNextPlaylistSongs() async {
     offset.value += limit.value;
     final res = await PlaylistRepository.getSongsInPlaylist(

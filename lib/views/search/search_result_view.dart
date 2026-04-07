@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/utils/time_util.dart';
+import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_playlist_list.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_album_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_singer_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_song_list.dart';
+import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:get/get.dart';
 
 class SearchResultView extends StatefulWidget {
@@ -16,10 +19,11 @@ class SearchResultView extends StatefulWidget {
 
 class _SearchResultViewState extends State<SearchResultView>
     with TickerProviderStateMixin {
-  late String _keyword; // 从上个页面带来的搜索参数
+  late String _keywords; // 从上个页面带来的搜索参数
   final TextEditingController _searchController =
       TextEditingController(); // 搜索框控制器
   late TabController _tabController;
+  final _searchResultVM = Get.put(SearchResultViewmodel());
 
   List<Widget> get _tabs {
     return const [
@@ -47,10 +51,10 @@ class _SearchResultViewState extends State<SearchResultView>
   @override
   void initState() {
     super.initState();
-    _keyword = Get.arguments['keyword'] ?? '';
-    _searchController.text = _keyword;
+    _keywords = Get.arguments['keywords'] ?? '';
+    _searchController.text = _keywords;
     _tabController = TabController(length: _tabs.length, vsync: this);
-    print('上一个页面带来的搜索参数: $_keyword');
+    _searchResultVM.getSearchResult(_keywords, type: 1018);
   }
 
   @override

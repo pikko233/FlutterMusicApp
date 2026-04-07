@@ -17,4 +17,15 @@ class CountUtil {
         ? value.toInt().toString()
         : value.toStringAsFixed(1);
   }
+
+  // 取出字符串中的数字
+  static int getCountFromStriing(String text) {
+    final match = RegExp(r'\d+').firstMatch(text);
+    if (match != null) {
+      final count = int.parse(match.group(0)!);
+      return count;
+    } else {
+      return 0;
+    }
+  }
 }

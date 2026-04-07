@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_lyric/flutter_lyric.dart';
 import 'package:flutter_music_app/models/song_model.dart';
-import 'package:flutter_music_app/repositories/playlist_repository.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart' hide Rx;
 
@@ -24,7 +23,7 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
-  final playlistId = RxnInt(); // 当前歌单id，由于分页加载，所以需要存进来，播放到最后一首时加载下一页的请求需要传入该id
+  Future<List<SongModel>> Function(int offset)? _loadMoreCallback; // 加载更多歌曲的回调，不同来源（歌单/搜索）传入不同实现
   final playlist =
       <SongModel>[].obs; // 当前播放列表（分页加载，可能不包含所有歌）, 列表api不返回音频资源url字段
   final songTotalCount = 0.obs; // 播放列表歌曲总数（包含所有分页）
@@ -146,7 +145,7 @@ class PlayerService extends GetxController {
     int id,
     List<SongModel> list,
     int total,
-    int listId, {
+    Future<List<SongModel>> Function(int offset)? loadMore, {
     bool needPlay = true,
   }) async {
     try {
@@ -155,7 +154,7 @@ class PlayerService extends GetxController {
       if (!isAvailable.value) return; // 没有版权就返回
       playlist.value = [...list];
       songTotalCount.value = total;
-      playlistId.value = listId;
+      _loadMoreCallback = loadMore;
       if (currentSongId.value == id) {
         // 如果点击的是同一首歌，后面逻辑不执行
         if (needPlay) {
@@ -175,16 +174,13 @@ class PlayerService extends GetxController {
     }
   }
 
-  // 加载歌单中的下一页歌曲列表
+  // 加载下一页歌曲列表
   Future<void> loadMore() async {
     if (playlist.length >= songTotalCount.value) return;
+    if (_loadMoreCallback == null) return;
     try {
       isLoading.value = true;
-      final res = await PlaylistRepository.getSongsInPlaylist(
-        playlistId.value!,
-        limit: 50,
-        offset: playlist.length,
-      );
+      final res = await _loadMoreCallback!(playlist.length);
       playlist.addAll(res);
     } catch (e) {
       print(e);

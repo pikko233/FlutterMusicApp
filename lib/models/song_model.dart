@@ -8,7 +8,8 @@ class SongModel {
   final String name; // 歌曲名称
   final List<ArtistModel> ar; // 歌手（可能有多个）
   final AlbumModel al; // 专辑
-  final int dt;
+  final int dt; // 时长（毫秒）
+  final int fee; // 付费类型：0=免费 1=VIP 8=数字专辑
 
   String get singersName => ar.map((e) => e.name).join(' / ');
   String get picUrl => al.picUrl;
@@ -19,6 +20,7 @@ class SongModel {
     required this.ar,
     required this.al,
     required this.dt,
+    required this.fee,
   });
 
   SongModel copyWith({
@@ -27,6 +29,7 @@ class SongModel {
     List<ArtistModel>? ar,
     AlbumModel? al,
     int? dt,
+    int? fee,
   }) {
     return SongModel(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class SongModel {
       ar: ar ?? this.ar,
       al: al ?? this.al,
       dt: dt ?? this.dt,
+      fee: fee ?? this.fee,
     );
   }
 
@@ -44,6 +48,7 @@ class SongModel {
       'ar': ar.map((x) => x.toMap()).toList(),
       'al': al.toMap(),
       'dt': dt,
+      'fee': fee,
     };
   }
 
@@ -58,6 +63,7 @@ class SongModel {
       ),
       al: AlbumModel.fromMap(map['al'] as Map<String, dynamic>),
       dt: map['dt'] as int,
+      fee: map['fee'] as int? ?? 0,
     );
   }
 
@@ -68,7 +74,7 @@ class SongModel {
 
   @override
   String toString() {
-    return 'SongModel(id: $id, name: $name, ar: $ar, al: $al, dt: $dt)';
+    return 'SongModel(id: $id, name: $name, ar: $ar, al: $al, dt: $dt, fee: $fee)';
   }
 
   @override
@@ -79,7 +85,8 @@ class SongModel {
         other.name == name &&
         listEquals(other.ar, ar) &&
         other.al == al &&
-        other.dt == dt;
+        other.dt == dt &&
+        other.fee == fee;
   }
 
   @override
@@ -88,7 +95,8 @@ class SongModel {
         name.hashCode ^
         ar.hashCode ^
         al.hashCode ^
-        dt.hashCode;
+        dt.hashCode ^
+        fee.hashCode;
   }
 }
 

@@ -164,7 +164,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                         songList[0].id,
                                         songList,
                                         playlist.trackCount,
-                                        playlist.id,
+                                        _playlistDetailVM.loadMoreSongsForPlayer,
                                       );
                                     },
                                     icon: Icon(
@@ -367,7 +367,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                 item.id,
                                 songList,
                                 playlist.trackCount,
-                                playlist.id,
+                                _playlistDetailVM.loadMoreSongsForPlayer,
                               );
                               Get.toNamed(AppRoutes.playerScreen);
                             }
