@@ -1,6 +1,5 @@
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/repositories/search_repository.dart';
-import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:get/state_manager.dart';
 
 class SearchResultViewmodel extends GetxController {
@@ -12,37 +11,67 @@ class SearchResultViewmodel extends GetxController {
   final playlists = [].obs; // 歌单列表
   final albums = [].obs; // 专辑列表
   final artists = [].obs; // 歌手列表
+  final int _limit = 30; // 每页数量
 
-  String _currentKeywords = ''; // 当前搜索关键词，用于分页加载
+  String currentKeywords = ''; // 当前搜索关键词，用于分页加载
 
   // 为播放器提供的分页加载回调：加载搜索结果歌曲的下一页
-  Future<List<SongModel>> loadMoreSongs(int offset) async {
+  Future<List<SongModel>> loadMoreSongsForPlayer(int offset) async {
+    if (songs.length >= songTotalCount.value) {
+      return [];
+    }
     final res = await SearchRepository.getSearchResult(
-      _currentKeywords,
-      limit: 30,
+      currentKeywords,
+      limit: _limit,
       offset: offset,
       type: 1,
     );
-    return (res['songs'] as List).map((e) => SongModel.fromMap(e)).toList();
+    return (res['songs'] as List)
+        .map((e) => SongModel.fromType1Map(e))
+        .toList();
+  }
+
+  // 加载搜索结果歌曲的下一页
+  Future<void> loadMoreSongs() async {
+    if (songs.length >= songTotalCount.value) {
+      return;
+    }
+    final newOffset = songs.length + _limit;
+    final res = await SearchRepository.getSearchResult(
+      currentKeywords,
+      limit: _limit,
+      offset: newOffset,
+      type: 1,
+    );
+    final newSongs =
+        (res['songs'] as List).map((e) => SongModel.fromType1Map(e)).toList();
+    final remaining = songTotalCount.value - songs.length;
+    songs.addAll(newSongs.take(remaining));
   }
 
   // 获取搜索结果
-  Future<void> getSearchResult(String keywords, {int? limit, int? type}) async {
-    _currentKeywords = keywords;
+  Future<void> getSearchResult(
+    String keywords, {
+    int? limit,
+    int? offset,
+    int? type,
+  }) async {
+    if (isLoading.value) {
+      return;
+    }
+    currentKeywords = keywords;
     try {
       isLoading.value = true;
       final res = await SearchRepository.getSearchResult(
         keywords,
-        limit: limit,
+        limit: _limit,
+        offset: offset,
         type: type,
       );
-      // print('搜索结果: $res');
-      songs.value = (res['song']['songs'] as List)
-          .map((e) => SongModel.fromMap(e))
-          .toList();
-      songTotalCount.value = CountUtil.getCountFromStriing(
-        res['song']['moreText'],
+      songs.addAll(
+        (res['songs'] as List).map((e) => SongModel.fromType1Map(e)).toList(),
       );
+      songTotalCount.value = res['songCount'] as int;
       print('搜索结果-歌曲列表: $songs');
       print('歌曲总数: $songTotalCount');
     } catch (e) {

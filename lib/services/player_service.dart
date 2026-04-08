@@ -23,7 +23,8 @@ class PlayerService extends GetxController {
   final songUrl = RxnString(); // 歌曲音频资源URL
   final isPlaying = false.obs; // 当前歌曲是否在播放
   final currentSongId = RxnInt(); // 当前歌曲ID
-  Future<List<SongModel>> Function(int offset)? _loadMoreCallback; // 加载更多歌曲的回调，不同来源（歌单/搜索）传入不同实现
+  Future<List<SongModel>> Function(int offset)?
+  _loadMoreCallback; // 加载更多歌曲的回调，不同来源（歌单/搜索）传入不同实现
   final playlist =
       <SongModel>[].obs; // 当前播放列表（分页加载，可能不包含所有歌）, 列表api不返回音频资源url字段
   final songTotalCount = 0.obs; // 播放列表歌曲总数（包含所有分页）
@@ -152,9 +153,6 @@ class PlayerService extends GetxController {
       isLoading.value = true;
       isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
       if (!isAvailable.value) return; // 没有版权就返回
-      playlist.value = [...list];
-      songTotalCount.value = total;
-      _loadMoreCallback = loadMore;
       if (currentSongId.value == id) {
         // 如果点击的是同一首歌，后面逻辑不执行
         if (needPlay) {
@@ -163,6 +161,9 @@ class PlayerService extends GetxController {
         }
         return;
       }
+      playlist.value = [...list];
+      songTotalCount.value = total;
+      _loadMoreCallback = loadMore;
       currentSongId.value = id;
       await _getSongDetail(id); // 获取歌曲信息
       await _getSongUrl(id); // 获取歌曲音频资源url
@@ -181,7 +182,10 @@ class PlayerService extends GetxController {
     try {
       isLoading.value = true;
       final res = await _loadMoreCallback!(playlist.length);
-      playlist.addAll(res);
+      // 搜索歌曲api 一共309首歌，但是最后一次请求limit=30&offset=300 又给我返回30首而不是9首，309首变330首
+      // 不知道网易怎么写的api，只能在这里截取一下
+      final remaining = songTotalCount.value - playlist.length;
+      playlist.addAll(res.take(remaining));
     } catch (e) {
       print(e);
     } finally {
@@ -193,6 +197,12 @@ class PlayerService extends GetxController {
   Future<void> _getSongDetail(int id) async {
     final res = await SongRepository.getSongDetail(id);
     song.value = res;
+    // playlist[currentIndex].picUrl = song.value.picUrl;
+    // 用详情接口返回的专辑封面更新 playlist 对应项（type=1 搜索结果无 picUrl）
+    final index = playlist.indexWhere((s) => s.id == id);
+    if (index != -1 && playlist[index].picUrl.isEmpty) {
+      playlist[index] = playlist[index].copyWith(al: res.al);
+    }
   }
 
   // 检查歌曲是否有版权

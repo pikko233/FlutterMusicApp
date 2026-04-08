@@ -35,23 +35,21 @@ class SearchSongCell extends StatelessWidget {
               : Colors.transparent,
         ),
       ),
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: NeteaseImage(url: image, width: 40, height: 40),
-      ),
+      // leading: ClipRRect(
+      //   borderRadius: BorderRadius.circular(8),
+      //   child: NeteaseImage(url: image, width: 40, height: 40),
+      // ),
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: isPlaying ? AppColors.primary : AppColors.textPrimary,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: isPlaying ? AppColors.primary : AppColors.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
             ),
           ),
           !isPlaying
@@ -83,6 +81,7 @@ class SearchSongCell extends StatelessWidget {
       subtitle: Text(
         subtitle,
         maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: AppColors.textPrimary60,
           fontSize: 12,

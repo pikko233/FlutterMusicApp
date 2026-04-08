@@ -97,6 +97,7 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
                           index: index,
                           song: song,
                           onPressedPlay: () => widget.onPressed(index),
+                          showImage: false,
                         );
                       },
                     ),

@@ -67,6 +67,28 @@ class SongModel {
     );
   }
 
+  // 用于解析 /search?type=1 返回的歌曲格式
+  // 与 type=1018 的区别：字段名不同（artists/duration/album），且 album 无 picUrl
+  factory SongModel.fromType1Map(Map<String, dynamic> map) {
+    final album = map['album'] as Map<String, dynamic>;
+    return SongModel(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      ar: List<ArtistModel>.from(
+        (map['artists'] as List<dynamic>).map<ArtistModel>(
+          (x) => ArtistModel.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      al: AlbumModel(
+        id: album['id'] as int,
+        name: album['name'] as String,
+        picUrl: '', // type=1 无 picUrl，picId 无法直接转换为 URL
+      ),
+      dt: map['duration'] as int,
+      fee: map['fee'] as int? ?? 0,
+    );
+  }
+
   String toJson() => json.encode(toMap());
 
   factory SongModel.fromJson(String source) =>

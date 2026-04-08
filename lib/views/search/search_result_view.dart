@@ -54,7 +54,7 @@ class _SearchResultViewState extends State<SearchResultView>
     _keywords = Get.arguments['keywords'] ?? '';
     _searchController.text = _keywords;
     _tabController = TabController(length: _tabs.length, vsync: this);
-    _searchResultVM.getSearchResult(_keywords, type: 1018);
+    _searchResultVM.getSearchResult(_keywords, type: 1);
   }
 
   @override
