@@ -26,9 +26,9 @@ class SearchResultViewmodel extends GetxController {
       offset: offset,
       type: 1,
     );
-    return (res['songs'] as List)
-        .map((e) => SongModel.fromType1Map(e))
-        .toList();
+    final rawSongs = res['songs'];
+    if (rawSongs == null) return [];
+    return (rawSongs as List).map((e) => SongModel.fromType1Map(e)).toList();
   }
 
   // 加载搜索结果歌曲的下一页
@@ -36,15 +36,17 @@ class SearchResultViewmodel extends GetxController {
     if (songs.length >= songTotalCount.value) {
       return;
     }
-    final newOffset = songs.length + _limit;
     final res = await SearchRepository.getSearchResult(
       currentKeywords,
       limit: _limit,
-      offset: newOffset,
+      offset: songs.length,
       type: 1,
     );
-    final newSongs =
-        (res['songs'] as List).map((e) => SongModel.fromType1Map(e)).toList();
+    final rawSongs = res['songs'];
+    if (rawSongs == null) return;
+    final newSongs = (rawSongs as List)
+        .map((e) => SongModel.fromType1Map(e))
+        .toList();
     final remaining = songTotalCount.value - songs.length;
     songs.addAll(newSongs.take(remaining));
   }
@@ -68,9 +70,9 @@ class SearchResultViewmodel extends GetxController {
         offset: offset,
         type: type,
       );
-      songs.addAll(
-        (res['songs'] as List).map((e) => SongModel.fromType1Map(e)).toList(),
-      );
+      songs.value = (res['songs'] as List)
+          .map((e) => SongModel.fromType1Map(e))
+          .toList();
       songTotalCount.value = res['songCount'] as int;
       print('搜索结果-歌曲列表: $songs');
       print('歌曲总数: $songTotalCount');

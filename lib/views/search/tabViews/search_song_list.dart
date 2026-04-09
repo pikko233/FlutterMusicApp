@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
@@ -57,7 +58,7 @@ class _SearchSongListState extends State<SearchSongList> {
               top: 0,
               left: 20,
               right: 20,
-              bottom: 80,
+              bottom: 0,
             ),
             sliver: SliverList.separated(
               itemCount: _searchResultVM.songs.length,
@@ -71,7 +72,11 @@ class _SearchSongListState extends State<SearchSongList> {
                   title: item.name,
                   subtitle:
                       "${item.singersName} - ${item.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
-                  onPressedPlay: () {
+                  onPressedPlay: () async {
+                    final res = await _player.checkSong(item.id);
+                    if (!res) {
+                      return;
+                    }
                     _player.playSong(
                       item.id,
                       _searchResultVM.songs,
@@ -83,6 +88,28 @@ class _SearchSongListState extends State<SearchSongList> {
                   onPressedMore: () {},
                 );
               },
+            ),
+          ),
+          // 加载更多图标
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 60),
+              child: SizedBox(
+                height: 60,
+                child: Center(
+                  child:
+                      _searchResultVM.songs.length >=
+                          _searchResultVM.songTotalCount.value
+                      ? Text(
+                          '没有更多了',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 15,
+                          ),
+                        )
+                      : CircularProgressIndicator(),
+                ),
+              ),
             ),
           ),
         ],

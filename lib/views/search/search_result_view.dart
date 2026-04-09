@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/utils/time_util.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
+import 'package:flutter_music_app/viewmodels/search_viewmodel.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_playlist_list.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_album_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_singer_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_song_list.dart';
-import 'package:flutter_music_app/widgets/search_song_cell.dart';
+import 'package:flutter_music_app/widgets/search_suggestion.dart';
+import 'package:flutter_music_app/widgets/search_text_field.dart';
 import 'package:get/get.dart';
 
 class SearchResultView extends StatefulWidget {
@@ -24,6 +27,10 @@ class _SearchResultViewState extends State<SearchResultView>
       TextEditingController(); // 搜索框控制器
   late TabController _tabController;
   final _searchResultVM = Get.put(SearchResultViewmodel());
+  final _searchVM = Get.find<SearchViewmodel>();
+  bool _showSuggestions = false; // 是否显示搜索建议
+  final _focusNode = FocusNode();
+  final _debounceUtil = DebounceUtil();
 
   List<Widget> get _tabs {
     return const [
@@ -43,25 +50,53 @@ class _SearchResultViewState extends State<SearchResultView>
     ];
   }
 
-  // 取消搜索
+  // 取消按钮
   void _cancelSearch() {
     _searchController.text = '';
+    _focusNode.unfocus();
+    _searchVM.searchSuggest.value = [];
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     _keywords = Get.arguments['keywords'] ?? '';
-    _searchController.text = _keywords;
     _tabController = TabController(length: _tabs.length, vsync: this);
-    _searchResultVM.getSearchResult(_keywords, type: 1);
+    _search(_keywords);
+
+    _focusNode.addListener(() {
+      // 搜索框失去焦点时隐藏列表
+      if (!_focusNode.hasFocus) {
+        setState(() {
+          _showSuggestions = false;
+        });
+      } else {
+        setState(() {
+          _showSuggestions = true;
+        });
+      }
+    });
+  }
+
+  void _search(String word) {
+    _searchController.text = word;
+    _searchResultVM.getSearchResult(word, type: 1);
+    _searchVM.getSearchSuggest(word);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _tabController.dispose();
+    _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onSearchChange(String value) {
+    // 搜索关键字变化
+    // 防抖处理
+    _debounceUtil.debounce(() async => await _searchVM.getSearchSuggest(value));
   }
 
   @override
@@ -73,34 +108,22 @@ class _SearchResultViewState extends State<SearchResultView>
           onPressed: () => Get.back(),
           icon: Icon(Icons.arrow_back),
         ),
-        title: TextField(
+        title: SearchTextField(
           controller: _searchController,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(0),
-            hintText: "想听点啥～",
-            hintStyle: TextStyle(color: AppColors.textHint),
-            filled: true,
-            fillColor: AppColors.bgPrimary.withValues(alpha: 0.3),
-            prefixIcon: Icon(Icons.search, color: AppColors.textHint),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-          ),
+          hintText: "想听点啥～",
+          focusNode: _focusNode,
+          onChanged: _onSearchChange,
+          onSubmitted: (word) {
+            if (word.trim() != '') {
+              _focusNode.unfocus();
+              _search(word);
+            }
+          },
         ),
         actions: [
           TextButton(
             onPressed: () {
               _cancelSearch();
-              setState(() {});
             },
             child: Text(
               "取消",
@@ -118,57 +141,86 @@ class _SearchResultViewState extends State<SearchResultView>
               end: Alignment.topCenter,
             ),
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
+            children: [
+              Material(
+                color: Colors.transparent,
+                child: Stack(
                   children: [
-                    // tabs: 歌曲、歌手、专辑、歌单、视频
-                    Container(
-                      height: kToolbarHeight - 10,
-                      color: AppColors.bgCard,
-                      child: TabBar(
-                        controller: _tabController,
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        indicator: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(25),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // tabs: 歌曲、歌手、专辑、歌单、视频
+                        Container(
+                          height: kToolbarHeight - 10,
+                          color: AppColors.bgCard,
+                          child: TabBar(
+                            controller: _tabController,
+                            isScrollable: true,
+                            tabAlignment: TabAlignment.start,
+                            indicator: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            dividerColor: Colors.transparent,
+                            labelColor: AppColors.textPrimary,
+                            unselectedLabelColor: AppColors.textHint,
+                            labelStyle: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            unselectedLabelStyle: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            tabs: _tabs,
+                          ),
                         ),
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        dividerColor: Colors.transparent,
-                        labelColor: AppColors.textPrimary,
-                        unselectedLabelColor: AppColors.textHint,
-                        labelStyle: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
+                        // tabBarViews
+                        Expanded(
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: _tabViews,
+                          ),
                         ),
-                        unselectedLabelStyle: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        tabs: _tabs,
-                      ),
+                      ],
                     ),
-                    // tabBarViews
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: _tabViews,
-                      ),
+                    // mini player: 迷你播放器
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: MiniPlayer(),
                     ),
                   ],
                 ),
-                // mini player: 迷你播放器
-                Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
-              ],
-            ),
+              ),
+              // Dart的&&是短路运算，
+              // 如果当 _showSuggestions 为 false 时,后面的 _searchVM.searchSuggest.isNotEmpty 根本不会执行,
+              // 于是 Obx 在这一帧内没有访问到任何 Rx 变量,就会抛出 "improper use of a GetX" 错误。
+              // 显示搜索建议
+              Obx(() {
+                final hasSuggestions = _searchVM
+                    .searchSuggest
+                    .isNotEmpty; // 解决方法：把 Rx 的读取放到前面,确保每次都会被访问:
+                if (!_showSuggestions || !hasSuggestions) {
+                  return const SizedBox.shrink();
+                }
+                return SearchSuggestion(
+                  top: 0,
+                  suggestions: _searchVM.searchSuggest,
+                  onPressed: (word) {
+                    _focusNode.unfocus();
+                    _search(word);
+                  },
+                );
+              }),
+            ],
           ),
         ),
       ),

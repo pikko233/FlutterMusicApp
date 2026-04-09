@@ -35,47 +35,21 @@ class SearchSongCell extends StatelessWidget {
               : Colors.transparent,
         ),
       ),
-      // leading: ClipRRect(
-      //   borderRadius: BorderRadius.circular(8),
-      //   child: NeteaseImage(url: image, width: 40, height: 40),
-      // ),
       title: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: isPlaying ? AppColors.primary : AppColors.textPrimary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isPlaying ? AppColors.primary : AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          !isPlaying
-              ? const SizedBox.shrink()
-              : Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.play_arrow,
-                        color: AppColors.primary.withValues(alpha: 0.7),
-                        size: 13,
-                      ),
-                      const SizedBox(width: 2),
-                      Text(
-                        "播放中",
-                        style: TextStyle(
-                          color: AppColors.primary.withValues(alpha: 0.7),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
         ],
       ),
       subtitle: Text(

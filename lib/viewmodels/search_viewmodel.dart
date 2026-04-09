@@ -16,7 +16,7 @@ class SearchViewmodel extends GetxController {
   Future<void> _loadData() async {
     try {
       isLoading.value = true;
-      Future.wait([_getSearchHot()]);
+      await Future.wait([_getSearchHot()]);
     } catch (e) {
       print(e);
     } finally {
@@ -36,6 +36,10 @@ class SearchViewmodel extends GetxController {
     String keywords, {
     String type = 'mobile',
   }) async {
+    if (keywords.isEmpty) {
+      searchSuggest.value = [];
+      return;
+    }
     final res = await SearchRepository.getSearchSuggest(keywords, type: type);
     print('搜索建议: $res');
     searchSuggest.value = res.length > 5 ? res.sublist(0, 5) : res;

@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/viewmodels/search_viewmodel.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:flutter_music_app/widgets/search_suggestion.dart';
+import 'package:flutter_music_app/widgets/search_text_field.dart';
 import 'package:get/get.dart';
 
 class SearchView extends StatefulWidget {
@@ -18,7 +21,7 @@ class _SearchViewState extends State<SearchView> {
   final _searchVM = Get.put(SearchViewmodel());
   bool _showSuggestions = false; // 是否显示搜索建议
   final _focusNode = FocusNode();
-  Timer? _debounceTimer;
+  final _debounceUtil = DebounceUtil();
 
   @override
   void initState() {
@@ -40,23 +43,18 @@ class _SearchViewState extends State<SearchView> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     super.dispose();
   }
 
   void _onSearchChange(String value) {
     // 搜索关键字变化
     // 防抖处理
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(Duration(milliseconds: 500), () async {
-      await _searchVM.getSearchSuggest(value);
-    });
+    _debounceUtil.debounce(() async => await _searchVM.getSearchSuggest(value));
   }
 
   @override
   Widget build(BuildContext context) {
-    // 搜索建议栏距离顶部的高度
-    final suggestBarTop =
-        kToolbarHeight * 1.2 + MediaQuery.paddingOf(context).top;
     return Obx(
       () => Stack(
         children: [
@@ -67,42 +65,20 @@ class _SearchViewState extends State<SearchView> {
                 backgroundColor: AppColors.bgCard,
                 elevation: 0,
                 scrolledUnderElevation: 0,
-                title: TextField(
+                // 搜索框
+                title: SearchTextField(
+                  hintText: "搜索音乐、专辑、歌手、歌单",
+                  focusNode: _focusNode,
                   onChanged: _onSearchChange,
-                  onSubmitted: (value) {
-                    print('搜索框输入: $value');
-                    if (value.trim() != '') {
+                  onSubmitted: (word) {
+                    if (word.trim() != '') {
+                      _focusNode.unfocus();
                       Get.toNamed(
                         AppRoutes.searchResult,
-                        arguments: {'keywords': value},
+                        arguments: {'keywords': word},
                       );
                     }
                   },
-                  focusNode: _focusNode,
-                  style: TextStyle(color: AppColors.textPrimary),
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(0),
-                    hintText: "搜索音乐、专辑、歌手、歌单",
-                    hintStyle: TextStyle(color: AppColors.textHint),
-                    filled: true,
-                    fillColor: AppColors.bgPrimary.withValues(alpha: 0.3),
-                    prefixIcon: Icon(Icons.search, color: AppColors.textHint),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(
-                        color: AppColors.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
                 ),
                 actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu))],
               ),
@@ -319,48 +295,19 @@ class _SearchViewState extends State<SearchView> {
               ),
             ],
           ),
-          // 搜索建议
-          _showSuggestions && _searchVM.searchSuggest.isNotEmpty
-              ? Positioned(
-                  top: suggestBarTop,
-                  left: 10,
-                  right: 10,
-                  child: Material(
-                    elevation: 8,
-                    color: AppColors.bgElevated,
-                    borderRadius: BorderRadius.circular(10),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(maxHeight: 280),
-                      child: ListView.builder(
-                        itemCount: _searchVM.searchSuggest.length,
-                        itemBuilder: (context, index) {
-                          final word = _searchVM.searchSuggest[index];
-                          return ListTile(
-                            leading: Icon(
-                              Icons.search,
-                              color: AppColors.textHint,
-                              size: 18,
-                            ),
-                            title: Text(
-                              word,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: AppColors.textPrimary80),
-                            ),
-                            onTap: () {
-                              _focusNode.unfocus();
-                              Get.toNamed(
-                                AppRoutes.searchResult,
-                                arguments: {'keywords': word},
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
+          // 显示搜索建议
+          if (_showSuggestions && _searchVM.searchSuggest.isNotEmpty)
+            SearchSuggestion(
+              top: kToolbarHeight,
+              suggestions: _searchVM.searchSuggest,
+              onPressed: (word) {
+                _focusNode.unfocus();
+                Get.toNamed(
+                  AppRoutes.searchResult,
+                  arguments: {'keywords': word},
+                );
+              },
+            ),
         ],
       ),
     );
