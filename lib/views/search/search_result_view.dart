@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/viewmodels/search_viewmodel.dart';
@@ -22,7 +21,6 @@ class SearchResultView extends StatefulWidget {
 
 class _SearchResultViewState extends State<SearchResultView>
     with TickerProviderStateMixin {
-  late String _keywords; // 从上个页面带来的搜索参数
   final TextEditingController _searchController =
       TextEditingController(); // 搜索框控制器
   late TabController _tabController;
@@ -32,21 +30,29 @@ class _SearchResultViewState extends State<SearchResultView>
   final _focusNode = FocusNode();
   final _debounceUtil = DebounceUtil();
 
+  // 参数type对应tab的映射
+  final Map<int, int> _typeMap = {
+    0: 1, // 1-歌曲
+    1: 10, // 2-专辑
+    2: 100, // 3-歌手
+    3: 1000, // 4-歌单
+  };
+
   List<Widget> get _tabs {
     return const [
       Tab(text: "歌曲"),
-      Tab(text: "歌手"),
       Tab(text: "专辑"),
+      Tab(text: "歌手"),
       Tab(text: "歌单"),
     ];
   }
 
   List<Widget> get _tabViews {
     return [
-      const SearchSongList(), // 歌曲tabView
-      const SearchSingerList(), // 歌手tabView
-      const SearchAlbumList(), // 专辑tabView
-      const SearchPlaylistList(), // 歌单tabView
+      const SearchSongList(), // 歌曲页
+      const SearchAlbumList(), // 专辑页
+      const SearchSingerList(), // 歌手页
+      const SearchPlaylistList(), // 歌单页
     ];
   }
 
@@ -61,10 +67,15 @@ class _SearchResultViewState extends State<SearchResultView>
   @override
   void initState() {
     super.initState();
-    _keywords = Get.arguments['keywords'] ?? '';
-    _tabController = TabController(length: _tabs.length, vsync: this);
-    _search(_keywords);
+    _searchController.text = Get.arguments['keywords'] ?? '';
+    _searchVM.getSearchSuggest(_searchController.text);
+    _tabController = TabController(
+      length: _tabs.length,
+      vsync: this,
+    ); // 初始化tabController
+    _search(); // 获取搜索结果
 
+    // 监听搜索框是否失焦
     _focusNode.addListener(() {
       // 搜索框失去焦点时隐藏列表
       if (!_focusNode.hasFocus) {
@@ -77,12 +88,37 @@ class _SearchResultViewState extends State<SearchResultView>
         });
       }
     });
+
+    // 监听tab切换
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging && _searchController.text.isNotEmpty) {
+        _search();
+      }
+    });
   }
 
-  void _search(String word) {
-    _searchController.text = word;
-    _searchResultVM.getSearchResult(word, type: 1);
-    _searchVM.getSearchSuggest(word);
+  // 发送搜索请求，获取搜索结果
+  void _search() {
+    switch (_tabController.index) {
+      case 0:
+        // 加载歌曲的搜索结果
+        _searchResultVM.getSearchResult(_searchController.text, type: 1);
+        break;
+      case 1:
+        // 加载专辑的搜索结果
+        _searchResultVM.getSearchResult(_searchController.text, type: 10);
+        break;
+      case 2:
+        // 加载歌手的搜索结果
+        _searchResultVM.getSearchResult(_searchController.text, type: 100);
+        break;
+      case 3:
+        // 加载歌单的搜索结果
+        _searchResultVM.getSearchResult(_searchController.text, type: 1000);
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -116,7 +152,7 @@ class _SearchResultViewState extends State<SearchResultView>
           onSubmitted: (word) {
             if (word.trim() != '') {
               _focusNode.unfocus();
-              _search(word);
+              _search();
             }
           },
         ),
@@ -216,7 +252,8 @@ class _SearchResultViewState extends State<SearchResultView>
                   suggestions: _searchVM.searchSuggest,
                   onPressed: (word) {
                     _focusNode.unfocus();
-                    _search(word);
+                    _searchController.text = word;
+                    _search();
                   },
                 );
               }),

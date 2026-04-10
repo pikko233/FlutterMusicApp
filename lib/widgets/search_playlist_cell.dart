@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/widgets/netease_image.dart';
 
 class SearchPlaylistCell extends StatelessWidget {
   final String image;
@@ -28,21 +29,18 @@ class SearchPlaylistCell extends StatelessWidget {
       ),
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.asset(image, width: 40, height: 40, fit: BoxFit.cover),
+        // child: Image.asset(image, width: 40, height: 40, fit: BoxFit.cover),
+        child: NeteaseImage(url: image, width: 40, height: 40),
       ),
-      title: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       subtitle: Text(
         subtitle,

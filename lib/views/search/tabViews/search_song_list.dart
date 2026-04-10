@@ -5,6 +5,7 @@ import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/utils/time_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
+import 'package:flutter_music_app/widgets/load_more_icon.dart';
 import 'package:flutter_music_app/widgets/search_result_count.dart';
 import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:get/get.dart';
@@ -92,23 +93,11 @@ class _SearchSongListState extends State<SearchSongList> {
           ),
           // 加载更多图标
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 60),
-              child: SizedBox(
-                height: 60,
-                child: Center(
-                  child:
-                      _searchResultVM.songs.length >=
-                          _searchResultVM.songTotalCount.value
-                      ? Text(
-                          '没有更多了',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 15,
-                          ),
-                        )
-                      : CircularProgressIndicator(),
-                ),
+            child: Obx(
+              () => LoadMoreIcon(
+                hasMore:
+                    _searchResultVM.songs.length <
+                    _searchResultVM.songTotalCount.value,
               ),
             ),
           ),

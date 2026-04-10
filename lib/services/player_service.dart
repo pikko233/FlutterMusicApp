@@ -234,7 +234,6 @@ class PlayerService extends GetxController {
   // 获取歌曲逐字歌词
   Future<void> _getSongLyric(int id) async {
     final res = await SongRepository.getSongLyric(id);
-    print('歌词: $res');
     final lyric = _filterEmptyLines(
       res['lrc']['lyric'] as String,
       fallback: '[00:00.000]该歌曲暂无歌词',

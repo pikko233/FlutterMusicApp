@@ -90,15 +90,16 @@ class PlaylistModel {
       description: map['description'] as String? ?? '',
       trackCount: map['trackCount'] as int,
       playCount: map['playCount'] as int,
-      subscribedCount: map['subscribedCount'] as int,
+      // 搜索接口返回 bookCount，歌单详情接口返回 subscribedCount
+      subscribedCount: (map['subscribedCount'] ?? map['bookCount']) as int? ?? 0,
       userId: map['userId'] as int,
-      createTime: map['createTime'] as int,
-      updateTime: map['updateTime'] as int,
+      createTime: map['createTime'] as int? ?? 0,
+      updateTime: map['updateTime'] as int? ?? 0,
       creator: map['creator'] != null
           ? CreatorModel.fromMap(map['creator'] as Map<String, dynamic>)
           : null,
-      shareCount: map['shareCount'] as int,
-      commentCount: map['commentCount'] as int,
+      shareCount: map['shareCount'] as int? ?? 0,
+      commentCount: map['commentCount'] as int? ?? 0,
     );
   }
 

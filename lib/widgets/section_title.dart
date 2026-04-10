@@ -30,11 +30,9 @@ class SectionTitle extends StatelessWidget {
             ),
           ),
           showMore
-              ? TextButton.icon(
-                  icon: Icon(Icons.chevron_right),
-                  iconAlignment: IconAlignment.end,
+              ? TextButton(
                   onPressed: onPressed,
-                  label: Text(
+                  child: Text(
                     showMoreLabel,
                     style: TextStyle(color: AppColors.primary, fontSize: 13),
                   ),
