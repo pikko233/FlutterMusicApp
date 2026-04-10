@@ -30,14 +30,6 @@ class _SearchResultViewState extends State<SearchResultView>
   final _focusNode = FocusNode();
   final _debounceUtil = DebounceUtil();
 
-  // 参数type对应tab的映射
-  final Map<int, int> _typeMap = {
-    0: 1, // 1-歌曲
-    1: 10, // 2-专辑
-    2: 100, // 3-歌手
-    3: 1000, // 4-歌单
-  };
-
   List<Widget> get _tabs {
     return const [
       Tab(text: "歌曲"),
@@ -91,30 +83,37 @@ class _SearchResultViewState extends State<SearchResultView>
 
     // 监听tab切换
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging && _searchController.text.isNotEmpty) {
-        _search();
+      // tab是否切换
+      if (_tabController.indexIsChanging) {
+        // 默认搜索参数为 - 输入框中的文本
+        // 如果输入框被清空，则使用上一次搜索的关键字（记录在SearchResultViewmodel的currentKeywords）
+        final word = _searchController.text.isNotEmpty
+            ? _searchController.text
+            : _searchResultVM.currentKeywords;
+        _search(word: word);
       }
     });
   }
 
   // 发送搜索请求，获取搜索结果
-  void _search() {
+  void _search({String word = ''}) {
+    final keywords = word.isNotEmpty ? word : _searchController.text;
     switch (_tabController.index) {
       case 0:
         // 加载歌曲的搜索结果
-        _searchResultVM.getSearchResult(_searchController.text, type: 1);
+        _searchResultVM.getSearchResult(keywords, type: 1);
         break;
       case 1:
         // 加载专辑的搜索结果
-        _searchResultVM.getSearchResult(_searchController.text, type: 10);
+        _searchResultVM.getSearchResult(keywords, type: 10);
         break;
       case 2:
         // 加载歌手的搜索结果
-        _searchResultVM.getSearchResult(_searchController.text, type: 100);
+        _searchResultVM.getSearchResult(keywords, type: 100);
         break;
       case 3:
         // 加载歌单的搜索结果
-        _searchResultVM.getSearchResult(_searchController.text, type: 1000);
+        _searchResultVM.getSearchResult(keywords, type: 1000);
         break;
       default:
         break;
@@ -157,15 +156,17 @@ class _SearchResultViewState extends State<SearchResultView>
           },
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              _cancelSearch();
-            },
-            child: Text(
-              "取消",
-              style: TextStyle(color: AppColors.textHint, fontSize: 16),
-            ),
-          ),
+          _searchController.text.isEmpty
+              ? const SizedBox.shrink()
+              : TextButton(
+                  onPressed: () {
+                    _cancelSearch();
+                  },
+                  child: Text(
+                    "取消",
+                    style: TextStyle(color: AppColors.textHint, fontSize: 16),
+                  ),
+                ),
         ],
       ),
       body: SafeArea(
@@ -186,7 +187,7 @@ class _SearchResultViewState extends State<SearchResultView>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // tabs: 歌曲、歌手、专辑、歌单、视频
+                        // tabs: 歌曲、专辑、歌手、歌单
                         Container(
                           height: kToolbarHeight - 10,
                           color: AppColors.bgCard,

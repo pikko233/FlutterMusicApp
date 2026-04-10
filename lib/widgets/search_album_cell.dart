@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/widgets/netease_image.dart';
 
 class SearchAlbumCell extends StatelessWidget {
   final String image;
@@ -17,50 +18,56 @@ class SearchAlbumCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.sizeOf(context);
-    return InkWell(
-      onTap: onPressed,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Image.asset(
-              image,
-              width: double.maxFinite,
-              height: double.maxFinite,
-              fit: BoxFit.cover,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          NeteaseImage(
+            url: image,
+            width: double.maxFinite,
+            height: double.maxFinite,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            width: double.maxFinite,
+            height: (media.width - 60) / 8,
+            decoration: BoxDecoration(
+              color: AppColors.bgCard.withValues(alpha: 0.86),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              width: double.maxFinite,
-              height: (media.width - 60) / 8,
-              decoration: BoxDecoration(
-                color: AppColors.bgCard.withValues(alpha: 0.9),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: AppColors.textPrimary60,
-                      fontSize: 10,
-                    ),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppColors.textPrimary60,
+                    fontSize: 10,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(onTap: onPressed),
+            ),
+          ),
+        ],
       ),
     );
   }

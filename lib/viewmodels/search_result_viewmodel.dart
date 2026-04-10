@@ -1,5 +1,6 @@
+import 'package:flutter_music_app/models/album_model.dart';
 import 'package:flutter_music_app/models/playlist_model.dart';
-import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/models/song_model.dart' hide AlbumModel;
 import 'package:flutter_music_app/repositories/search_repository.dart';
 import 'package:get/state_manager.dart';
 
@@ -11,7 +12,8 @@ class SearchResultViewmodel extends GetxController {
   final songTotalCount = 0.obs; // 歌曲总数
   final playlists = <PlaylistModel>[].obs; // 歌单列表
   final playlistTotalCount = 0.obs; // 歌单总数
-  final albums = [].obs; // 专辑列表
+  final albums = <AlbumModel>[].obs; // 专辑列表
+  final albumTotalCount = 0.obs;
   final artists = [].obs; // 歌手列表
   final int _limit = 30; // 每页数量
 
@@ -53,6 +55,26 @@ class SearchResultViewmodel extends GetxController {
     songs.addAll(newSongs.take(remaining));
   }
 
+  // 加载搜索结果 - 专辑的下一页
+  Future<void> loadMoreAlbums() async {
+    if (albums.length >= albumTotalCount.value) {
+      return;
+    }
+    final res = await SearchRepository.getSearchResult(
+      currentKeywords,
+      limit: _limit,
+      offset: albums.length,
+      type: 10,
+    );
+    final rawAlbums = res['albums'];
+    if (rawAlbums == null) return;
+    final newAlbums = (rawAlbums as List)
+        .map((e) => AlbumModel.fromMap(e))
+        .toList();
+    final remaining = albumTotalCount.value - albums.length;
+    albums.addAll(newAlbums.take(remaining));
+  }
+
   // 加载搜索结果 - 歌单的下一页
   Future<void> loadMorePlaylists() async {
     if (playlists.length >= playlistTotalCount.value) {
@@ -61,7 +83,7 @@ class SearchResultViewmodel extends GetxController {
     final res = await SearchRepository.getSearchResult(
       currentKeywords,
       limit: _limit,
-      offset: songs.length,
+      offset: playlists.length,
       type: 1000,
     );
     final rawPlaylist = res['playlists'];
@@ -118,6 +140,10 @@ class SearchResultViewmodel extends GetxController {
       } else if (type == 10) {
         // 专辑
         print('搜索结果-专辑: $res');
+        albums.value = ((res['albums'] as List?) ?? [])
+            .map((e) => AlbumModel.fromMap(e))
+            .toList();
+        albumTotalCount.value = (res['albumCount'] as int?) ?? 0;
       } else if (type == 100) {
         // 歌手
         print('搜索结果-歌手: $res');
