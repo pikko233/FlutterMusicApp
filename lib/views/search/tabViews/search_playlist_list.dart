@@ -40,8 +40,17 @@ class _SearchPlaylistListState extends State<SearchPlaylistList> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      if (_searchResultVM.isLoading.value) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 100),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
       if (_searchResultVM.playlists.isEmpty) {
-        return Center(child: CircularProgressIndicator());
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 100),
+          child: Center(child: Text('暂无相关歌单')),
+        );
       }
       return CustomScrollView(
         controller: _scrollController,
@@ -80,7 +89,7 @@ class _SearchPlaylistListState extends State<SearchPlaylistList> {
                     final songs = await PlaylistRepository.getSongsInPlaylist(
                       item.id,
                     );
-                    _player.playSong(
+                    await _player.playSong(
                       songs[0].id,
                       songs,
                       _searchResultVM.playlistTotalCount.value,

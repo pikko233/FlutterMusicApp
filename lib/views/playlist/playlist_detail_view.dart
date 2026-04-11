@@ -4,6 +4,7 @@ import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:flutter_music_app/viewmodels/playlist_detail_viewmodel.dart';
+import 'package:flutter_music_app/widgets/load_more_icon.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
@@ -159,12 +160,13 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     clipBehavior: Clip.antiAlias,
-                                    onPressed: () {
-                                      _player.playSong(
+                                    onPressed: () async {
+                                      await _player.playSong(
                                         songList[0].id,
                                         songList,
                                         playlist.trackCount,
-                                        _playlistDetailVM.loadMoreSongsForPlayer,
+                                        _playlistDetailVM
+                                            .loadMoreSongsForPlayer,
                                       );
                                     },
                                     icon: Icon(
@@ -343,7 +345,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       top: 10,
                       left: 20,
                       right: 20,
-                      bottom: 80,
+                      bottom: 0,
                     ),
                     sliver: SliverList.separated(
                       itemCount: songList.length,
@@ -355,7 +357,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                           // image: item.picUrl,
                           // title: item.name,
                           // subtitle:
-                          //     "${item.singersName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
+                          //     "${item.artistsName} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                           onPressedPlay: () async {
                             // 先判断一下音乐是否有版权
                             final isAvailable = await _player.checkSong(
@@ -363,7 +365,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                             );
                             if (isAvailable) {
                               // 如果音乐有版权，则跳转播放播放
-                              _player.playSong(
+                              await _player.playSong(
                                 item.id,
                                 songList,
                                 playlist.trackCount,
@@ -376,6 +378,11 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                       },
                       separatorBuilder: (context, index) =>
                           const SizedBox(height: 10),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: LoadMoreIcon(
+                      hasMore: songList.length < playlist.trackCount,
                     ),
                   ),
                 ],

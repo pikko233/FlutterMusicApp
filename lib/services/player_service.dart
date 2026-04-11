@@ -225,7 +225,7 @@ class PlayerService extends GetxController {
         tag: MediaItem(
           id: currentSongId.value.toString(),
           title: song.value!.name,
-          artist: song.value!.singersName,
+          artist: song.value!.artistsName,
           artUri: Uri.parse(song.value!.picUrl),
         ),
       ),

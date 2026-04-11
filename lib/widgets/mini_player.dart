@@ -84,7 +84,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
                   ),
                 ),
                 subtitle: Text(
-                  song.singersName,
+                  song.artistsName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

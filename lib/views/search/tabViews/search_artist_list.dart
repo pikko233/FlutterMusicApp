@@ -3,18 +3,18 @@ import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/widgets/load_more_icon.dart';
-import 'package:flutter_music_app/widgets/search_album_cell.dart';
 import 'package:flutter_music_app/widgets/search_result_count.dart';
+import 'package:flutter_music_app/widgets/search_artist_cell.dart';
 import 'package:get/get.dart';
 
-class SearchAlbumList extends StatefulWidget {
-  const SearchAlbumList({super.key});
+class SearchArtistList extends StatefulWidget {
+  const SearchArtistList({super.key});
 
   @override
-  State<SearchAlbumList> createState() => _SearchAlbumListState();
+  State<SearchArtistList> createState() => _SearchArtistListState();
 }
 
-class _SearchAlbumListState extends State<SearchAlbumList> {
+class _SearchArtistListState extends State<SearchArtistList> {
   final _searchResultVM = Get.find<SearchResultViewmodel>();
   final _scrollController = ScrollController();
   final _debounceUtil = DebounceUtil();
@@ -26,7 +26,9 @@ class _SearchAlbumListState extends State<SearchAlbumList> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
-        _debounceUtil.debounce(() => _searchResultVM.loadMoreAlbums());
+        _debounceUtil.debounce(
+          () async => await _searchResultVM.loadMoreArtists(),
+        );
       }
     });
   }
@@ -40,21 +42,20 @@ class _SearchAlbumListState extends State<SearchAlbumList> {
           child: Center(child: CircularProgressIndicator()),
         );
       }
-      if (_searchResultVM.albums.isEmpty) {
+      if (_searchResultVM.artists.isEmpty) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 100),
-          child: Center(child: Text('暂无相关专辑')),
+          child: Center(child: Text('暂无相关歌手')),
         );
       }
+      final artists = _searchResultVM.artists;
+      final artistTotalCount = _searchResultVM.artistTotalCount.value;
       return CustomScrollView(
         controller: _scrollController,
         slivers: [
           // 搜索结果数量
           SliverToBoxAdapter(
-            child: SearchResultCount(
-              count: _searchResultVM.albumTotalCount.value,
-              label: "张相关专辑",
-            ),
+            child: SearchResultCount(count: artistTotalCount, label: "位相关歌手"),
           ),
           SliverPadding(
             padding: const EdgeInsets.only(
@@ -63,37 +64,28 @@ class _SearchAlbumListState extends State<SearchAlbumList> {
               right: 20,
               bottom: 0,
             ),
-            sliver: SliverGrid.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: 1.5,
-              ),
-              itemCount: _searchResultVM.albums.length,
+            sliver: SliverList.separated(
+              itemCount: artists.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
-                final item = _searchResultVM.albums[index];
-                return SearchAlbumCell(
-                  image: item.picUrl,
+                final item = artists[index];
+                return SearchArtistCell(
+                  followed: item.followed,
+                  image: item.img1v1Url,
                   title: item.name,
-                  subtitle:
-                      "${item.artistsName} • ${DateTime.fromMillisecondsSinceEpoch(item.publishTime).year} • ${item.size}首",
+                  subtitle: "${item.musicSize}首歌曲",
                   onPressed: () {
-                    Get.toNamed(
-                      AppRoutes.albumDetail,
-                      arguments: {'id': item.id},
-                    );
+                    Get.toNamed(AppRoutes.singerDetail);
+                  },
+                  onPressedSub: () {
+                    print('点击关注歌手');
                   },
                 );
               },
             ),
           ),
           SliverToBoxAdapter(
-            child: LoadMoreIcon(
-              hasMore:
-                  _searchResultVM.albums.length <
-                  _searchResultVM.albumTotalCount.value,
-            ),
+            child: LoadMoreIcon(hasMore: artists.length < artistTotalCount),
           ),
         ],
       );

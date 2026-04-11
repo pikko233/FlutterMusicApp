@@ -261,7 +261,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                             SizedBox(
                                               height: 20,
                                               child: CustomMarquee(
-                                                text: song.singersName,
+                                                text: song.artistsName,
                                                 style: TextStyle(
                                                   color:
                                                       AppColors.textSecondary,

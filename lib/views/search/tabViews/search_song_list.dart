@@ -38,8 +38,17 @@ class _SearchSongListState extends State<SearchSongList> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      if (_searchResultVM.isLoading.value) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 100),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
       if (_searchResultVM.songs.isEmpty) {
-        return Center(child: CircularProgressIndicator());
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 100),
+          child: Center(child: Text('暂无相关歌曲')),
+        );
       }
       // 在 itemBuilder 外读取，让 Obx 追踪到此变量，currentSongId 变化时整个列表才会重建
       final currentSongId = _player.currentSongId.value;
@@ -68,16 +77,12 @@ class _SearchSongListState extends State<SearchSongList> {
                 return SearchSongCell(
                   isPlaying: item.id == currentSongId,
                   song: item,
-                  // image: item.picUrl,
-                  // title: item.name,
-                  // subtitle:
-                  //     "${item.singersName} - ${item.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                   onPressedPlay: () async {
                     final res = await _player.checkSong(item.id);
                     if (!res) {
                       return;
                     }
-                    _player.playSong(
+                    await _player.playSong(
                       item.id,
                       _searchResultVM.songs,
                       _searchResultVM.songTotalCount.value,

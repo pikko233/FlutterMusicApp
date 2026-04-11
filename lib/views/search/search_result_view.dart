@@ -6,7 +6,7 @@ import 'package:flutter_music_app/viewmodels/search_viewmodel.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_playlist_list.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_album_list.dart';
-import 'package:flutter_music_app/views/search/tabViews/search_singer_list.dart';
+import 'package:flutter_music_app/views/search/tabViews/search_artist_list.dart';
 import 'package:flutter_music_app/views/search/tabViews/search_song_list.dart';
 import 'package:flutter_music_app/widgets/search_suggestion.dart';
 import 'package:flutter_music_app/widgets/search_text_field.dart';
@@ -43,7 +43,7 @@ class _SearchResultViewState extends State<SearchResultView>
     return [
       const SearchSongList(), // 歌曲页
       const SearchAlbumList(), // 专辑页
-      const SearchSingerList(), // 歌手页
+      const SearchArtistList(), // 歌手页
       const SearchPlaylistList(), // 歌单页
     ];
   }

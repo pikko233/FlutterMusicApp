@@ -20,13 +20,11 @@ class AlbumDetailView extends StatefulWidget {
 
 class _AlbumDetailViewState extends State<AlbumDetailView> {
   late AlbumDetailViewmodel _albumDetailVM;
-  bool _descExpanded = false; // 是否展开歌单简介
   final _player = Get.find<PlayerService>();
 
   @override
   void initState() {
     super.initState();
-    print('页面传参id:${Get.arguments['id'] ?? 0}');
     _albumDetailVM = Get.put(
       AlbumDetailViewmodel(id: Get.arguments['id'] ?? 0),
     );
@@ -86,81 +84,92 @@ class _AlbumDetailViewState extends State<AlbumDetailView> {
                         horizontal: 20,
                         vertical: 10,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 歌单封面
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: NeteaseImage(
-                              url: album.picUrl,
-                              width: media.width * 0.3,
-                              height: media.width * 0.3,
-                              fit: BoxFit.cover,
+                      child: SizedBox(
+                        height: media.width * 0.3,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 专辑封面
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: NeteaseImage(
+                                url: album.picUrl,
+                                width: media.width * 0.3,
+                                height: media.width * 0.3,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // 专辑名称
-                                Text(
-                                  album.name,
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 专辑名称
+                                  Text(
+                                    album.name,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4), // 怎么让这行占据column的剩余空间
-                                // 歌手
-                                Text(
-                                  album.artistsName,
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary80,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
-                                // 发行时间
-                                Text(
-                                  "发行时间 ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(album.publishTime))}",
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary60,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                // 专辑简介
-                                album.briefDesc == null || album.briefDesc == ''
-                                    ? const SizedBox.shrink()
-                                    : GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _descExpanded = !_descExpanded;
-                                          });
-                                        },
-                                        child: Text(
-                                          album.briefDesc!,
-                                          maxLines: _descExpanded ? null : 1,
-                                          overflow: _descExpanded
-                                              ? TextOverflow.visible
-                                              : TextOverflow.ellipsis,
-                                          textAlign: TextAlign.center,
+                                  // 歌手
+                                  RichText(
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '歌手: ',
                                           style: TextStyle(
                                             color: AppColors.textPrimary60,
                                             fontSize: 13,
-                                            fontWeight: FontWeight.w500,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
+                                        TextSpan(
+                                          text: album.artistsName,
+                                          style: TextStyle(
+                                            color: AppColors.textPrimary80,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // 发行时间
+                                  Text(
+                                    "发行时间 ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(album.publishTime))}",
+                                    style: TextStyle(
+                                      color: AppColors.textPrimary60,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  // 专辑简介
+                                  if (album.briefDesc != null &&
+                                      album.briefDesc != '')
+                                    Text(
+                                      album.briefDesc!,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: AppColors.textPrimary60,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
                                       ),
-                              ],
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

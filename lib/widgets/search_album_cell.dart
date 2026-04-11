@@ -31,9 +31,15 @@ class SearchAlbumCell extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             width: double.maxFinite,
-            height: (media.width - 60) / 8,
+            height: media.width / 8,
             decoration: BoxDecoration(
-              color: AppColors.bgCard.withValues(alpha: 0.86),
+              gradient: LinearGradient(
+                colors: [Colors.black87, Colors.transparent],
+                // stops: []
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                stops: [0.7, 1],
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart';
 class SongModel {
   final int id; // 歌曲ID
   final String name; // 歌曲名称
-  final List<ArtistModel> ar; // 歌手（可能有多个）
-  final AlbumModel al; // 专辑
+  final List<Artist> ar; // 歌手（可能有多个）
+  final Album al; // 专辑
   final int dt; // 时长（毫秒）
   final int fee; // 付费类型：0=免费 1=VIP 8=数字专辑
 
-  String get singersName => ar.map((e) => e.name).join(' / ');
+  String get artistsName => ar.map((e) => e.name).join(' / ');
   String get picUrl => al.picUrl;
 
   SongModel({
@@ -26,8 +26,8 @@ class SongModel {
   SongModel copyWith({
     int? id,
     String? name,
-    List<ArtistModel>? ar,
-    AlbumModel? al,
+    List<Artist>? ar,
+    Album? al,
     int? dt,
     int? fee,
   }) {
@@ -56,12 +56,12 @@ class SongModel {
     return SongModel(
       id: map['id'] as int,
       name: map['name'] as String,
-      ar: List<ArtistModel>.from(
-        (map['ar'] as List<dynamic>).map<ArtistModel>(
-          (x) => ArtistModel.fromMap(x as Map<String, dynamic>),
+      ar: List<Artist>.from(
+        (map['ar'] as List<dynamic>).map<Artist>(
+          (x) => Artist.fromMap(x as Map<String, dynamic>),
         ),
       ),
-      al: AlbumModel.fromMap(map['al'] as Map<String, dynamic>),
+      al: Album.fromMap(map['al'] as Map<String, dynamic>),
       dt: map['dt'] as int,
       fee: map['fee'] as int? ?? 0,
     );
@@ -74,12 +74,12 @@ class SongModel {
     return SongModel(
       id: map['id'] as int,
       name: map['name'] as String,
-      ar: List<ArtistModel>.from(
-        (map['artists'] as List<dynamic>).map<ArtistModel>(
-          (x) => ArtistModel.fromMap(x as Map<String, dynamic>),
+      ar: List<Artist>.from(
+        (map['artists'] as List<dynamic>).map<Artist>(
+          (x) => Artist.fromMap(x as Map<String, dynamic>),
         ),
       ),
-      al: AlbumModel(
+      al: Album(
         id: album['id'] as int,
         name: album['name'] as String,
         picUrl: '', // type=1 无 picUrl，picId 无法直接转换为 URL
@@ -91,17 +91,20 @@ class SongModel {
 
   // 用于解析专辑详情 /album?id=xxx 返回的歌曲格式
   // al 字段无 picUrl，需从外部传入专辑封面 URL
-  factory SongModel.fromAlbumDetailMap(Map<String, dynamic> map, String albumPicUrl) {
+  factory SongModel.fromAlbumDetailMap(
+    Map<String, dynamic> map,
+    String albumPicUrl,
+  ) {
     final al = map['al'] as Map<String, dynamic>;
     return SongModel(
       id: map['id'] as int,
       name: map['name'] as String,
-      ar: List<ArtistModel>.from(
-        (map['ar'] as List<dynamic>).map<ArtistModel>(
-          (x) => ArtistModel.fromMap(x as Map<String, dynamic>),
+      ar: List<Artist>.from(
+        (map['ar'] as List<dynamic>).map<Artist>(
+          (x) => Artist.fromMap(x as Map<String, dynamic>),
         ),
       ),
-      al: AlbumModel(
+      al: Album(
         id: al['id'] as int,
         name: al['name'] as String,
         picUrl: albumPicUrl,
@@ -145,34 +148,34 @@ class SongModel {
 }
 
 // 艺术家（歌手）
-class ArtistModel {
+class Artist {
   final int id;
   final String name;
 
-  ArtistModel({required this.id, required this.name});
+  Artist({required this.id, required this.name});
 
-  ArtistModel copyWith({int? id, String? name}) {
-    return ArtistModel(id: id ?? this.id, name: name ?? this.name);
+  Artist copyWith({int? id, String? name}) {
+    return Artist(id: id ?? this.id, name: name ?? this.name);
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{'id': id, 'name': name};
   }
 
-  factory ArtistModel.fromMap(Map<String, dynamic> map) {
-    return ArtistModel(id: map['id'] as int, name: map['name'] as String);
+  factory Artist.fromMap(Map<String, dynamic> map) {
+    return Artist(id: map['id'] as int, name: map['name'] as String);
   }
 
   String toJson() => json.encode(toMap());
 
-  factory ArtistModel.fromJson(String source) =>
-      ArtistModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Artist.fromJson(String source) =>
+      Artist.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'ArtistModel(id: $id, name: $name)';
+  String toString() => 'Artist(id: $id, name: $name)';
 
   @override
-  bool operator ==(covariant ArtistModel other) {
+  bool operator ==(covariant Artist other) {
     if (identical(this, other)) return true;
 
     return other.id == id && other.name == name;
@@ -183,14 +186,14 @@ class ArtistModel {
 }
 
 // 专辑
-class AlbumModel {
+class Album {
   final int id;
   final String name; // 专辑名称
   final String picUrl; // 专辑封面
-  AlbumModel({required this.id, required this.name, required this.picUrl});
+  Album({required this.id, required this.name, required this.picUrl});
 
-  AlbumModel copyWith({int? id, String? name, String? picUrl}) {
-    return AlbumModel(
+  Album copyWith({int? id, String? name, String? picUrl}) {
+    return Album(
       id: id ?? this.id,
       name: name ?? this.name,
       picUrl: picUrl ?? this.picUrl,
@@ -201,8 +204,8 @@ class AlbumModel {
     return <String, dynamic>{'id': id, 'name': name, 'picUrl': picUrl};
   }
 
-  factory AlbumModel.fromMap(Map<String, dynamic> map) {
-    return AlbumModel(
+  factory Album.fromMap(Map<String, dynamic> map) {
+    return Album(
       id: map['id'] as int,
       name: map['name'] as String,
       picUrl: map['picUrl'] as String,
@@ -211,14 +214,14 @@ class AlbumModel {
 
   String toJson() => json.encode(toMap());
 
-  factory AlbumModel.fromJson(String source) =>
-      AlbumModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Album.fromJson(String source) =>
+      Album.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'AlbumModel(id: $id, name: $name, picUrl: $picUrl)';
+  String toString() => 'Album(id: $id, name: $name, picUrl: $picUrl)';
 
   @override
-  bool operator ==(covariant AlbumModel other) {
+  bool operator ==(covariant Album other) {
     if (identical(this, other)) return true;
 
     return other.id == id && other.name == name && other.picUrl == picUrl;

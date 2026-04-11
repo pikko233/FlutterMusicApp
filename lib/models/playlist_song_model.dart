@@ -22,7 +22,7 @@ class PlaylistSongModel {
 
   String get picUrl => al.picUrl;
 
-  String get singersName => ar.map((e) => e.name).join(' / ');
+  String get artistsName => ar.map((e) => e.name).join(' / ');
 
   PlaylistSongModel copyWith({
     int? id,

@@ -1,5 +1,5 @@
 import 'package:flutter_music_app/models/album_model.dart';
-import 'package:flutter_music_app/models/song_model.dart' hide AlbumModel;
+import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/repositories/album_repository.dart';
 import 'package:get/get.dart';
 

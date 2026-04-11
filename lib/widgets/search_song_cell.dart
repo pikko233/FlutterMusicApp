@@ -55,7 +55,7 @@ class SearchSongCell extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        "${song.singersName} - ${song.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: song.dt))}",
+        "${song.artistsName} - ${song.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: song.dt))}",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(

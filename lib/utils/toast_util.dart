@@ -31,7 +31,7 @@ class ToastUtil {
   static void showToast2(
     BuildContext context,
     String message, {
-    int duration = 500,
+    int duration = 1000,
   }) {
     final media = MediaQuery.sizeOf(context);
     ScaffoldMessenger.of(context)
