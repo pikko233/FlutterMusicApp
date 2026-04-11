@@ -55,7 +55,7 @@ class SearchAlbumCell extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: AppColors.textPrimary60,
-                    fontSize: 10,
+                    fontSize: 11,
                   ),
                 ),
               ],

@@ -29,7 +29,6 @@ class SongRepository {
       '/song/url/v1',
       params: {'id': id, 'level': level},
     );
-    print('获取音乐URL: $res');
     return res.data['data'][0]['url'];
   }
 
@@ -42,7 +41,6 @@ class SongRepository {
       '/song/url/v1',
       params: {'id': ids.join(','), 'level': level},
     );
-    print('获取所有音乐的URL: $res');
     return res.data['data'];
   }
 

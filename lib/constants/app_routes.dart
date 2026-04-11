@@ -6,4 +6,5 @@ abstract class AppRoutes {
   static const singerDetail = '/singer_detail'; // 歌手主页
   static const playerScreen = '/player_screen'; // 音乐播放器页面
   static const highQualityPlaylist = '/more_playlist'; // 更多歌单页面
+  static const albumDetail = '/album_detail'; // 专辑详情页
 }

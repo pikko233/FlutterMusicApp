@@ -35,6 +35,11 @@ class PlayerService extends GetxController {
     LoopMode.one: Icons.repeat_one,
     LoopMode.all: Icons.repeat,
   };
+  final Map<LoopMode, String> _loopToastMap = {
+    LoopMode.off: '播完暂停',
+    LoopMode.one: '单曲循环',
+    LoopMode.all: '循环播放',
+  };
   final volumn = 1.0.obs; // 播放器音量（非系统音量，ios不允许app直接修改系统音量）
 
   bool get hasMore => playlist.length < songTotalCount.value;
@@ -88,10 +93,8 @@ class PlayerService extends GetxController {
         rotationController.repeat(); // 开始旋转
       }
 
-      // 判断当前歌曲是否是播放列表最后几首
-      if (currentIndex == (playlist.length - 3).clamp(0, playlist.length - 3)) {
-        // 加载下一页歌曲列表
-        print('加载下一页歌曲列表');
+      // 判断当前歌曲是否是播放列表最后几首，触发加载下一页
+      if (hasMore && currentIndex >= playlist.length - 3) {
         loadMore();
       }
     });
@@ -154,11 +157,11 @@ class PlayerService extends GetxController {
       isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
       if (!isAvailable.value) return; // 没有版权就返回
       if (currentSongId.value == id) {
-        // 如果点击的是同一首歌，后面逻辑不执行
         if (needPlay) {
           // 从歌单列表点击来就播放，从miniplayer迷你播放器点进来不自动播放
           play();
         }
+        // 如果点击的是同一首歌，后面逻辑不执行
         return;
       }
       playlist.value = [...list];
@@ -287,12 +290,15 @@ class PlayerService extends GetxController {
   }
 
   // 切换歌曲循环模式
-  void toggleLoopMode() {
+  void toggleLoopMode({BuildContext? context}) {
     final modes = [LoopMode.off, LoopMode.one, LoopMode.all];
     final currentModeIndex = modes.indexOf(_loopMode);
     final nextIndex = (currentModeIndex + 1) % modes.length;
     _loopMode = modes[nextIndex];
     loopModeIcon.value = _loopModeIconMap[_loopMode];
+    if (context != null) {
+      ToastUtil.showToast2(context, _loopToastMap[_loopMode]!);
+    }
   }
 
   // 播放指定索引的歌曲

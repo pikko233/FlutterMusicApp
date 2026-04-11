@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/widgets/load_more_icon.dart';
@@ -69,7 +70,12 @@ class _SearchAlbumListState extends State<SearchAlbumList> {
                   subtitle:
                       "${item.artistsName} • ${DateTime.fromMillisecondsSinceEpoch(item.publishTime).year} • ${item.size}首",
                   onPressed: () {
+                    // TODO 跳转专辑详情页
                     print("点击了专辑: $index");
+                    Get.toNamed(
+                      AppRoutes.albumDetail,
+                      arguments: {'id': item.id},
+                    );
                   },
                 );
               },

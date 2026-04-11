@@ -22,6 +22,7 @@ class SongPopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<int>(
       color: AppColors.bgElevated,
+      offset: Offset(-40, 40),
       itemBuilder: (context) => [
         PopupMenuItem(
           value: _buttonValueMap[MenuButton.toggleFavorite],

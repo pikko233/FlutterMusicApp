@@ -35,7 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   get: ^4.6.6 # getx状态管理工具 - 最新版本(4.7.*)命名路由跳转有bug，这里用4.6.6
-  intl: ^0.20.2 # 数字格式化工具 - 用于千分位分隔符
+  intl: ^0.20.2 # 格式化工具 - 用于千分位分隔符、日期时间格式化
   audio_video_progress_bar: ^2.0.3 # 音频播放进度条
   dio: ^5.9.2 # http请求库
   cached_network_image: ^3.4.1 # 将网络图片缓存至本地，防止刷新页面时重新发送请求获取图片，浪费资源

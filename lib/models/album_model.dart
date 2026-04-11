@@ -11,6 +11,10 @@ class AlbumModel {
   final int size; // 歌单内歌曲数量
   final int publishTime; // 发布时间（毫秒时间戳）
   final String? companyName; // 发行公司
+  final String? briefDesc; // 专辑简介
+  final int commentCount; // 评论数
+  final int likedCount; // 点赞数
+  final int shareCount; // 分享数
   final List<Artist> artists; // 艺人列表
 
   String get artistsName => artists.map((e) => e.name).join(' / ');
@@ -23,6 +27,10 @@ class AlbumModel {
     required this.size,
     required this.publishTime,
     required this.companyName,
+    this.briefDesc,
+    this.commentCount = 0,
+    this.likedCount = 0,
+    this.shareCount = 0,
     required this.artists,
   });
 
@@ -34,6 +42,10 @@ class AlbumModel {
     int? size,
     int? publishTime,
     String? companyName,
+    String? briefDesc,
+    int? commentCount,
+    int? likedCount,
+    int? shareCount,
     List<Artist>? artists,
   }) {
     return AlbumModel(
@@ -44,6 +56,10 @@ class AlbumModel {
       size: size ?? this.size,
       publishTime: publishTime ?? this.publishTime,
       companyName: companyName ?? this.companyName,
+      briefDesc: briefDesc ?? this.briefDesc,
+      commentCount: commentCount ?? this.commentCount,
+      likedCount: likedCount ?? this.likedCount,
+      shareCount: shareCount ?? this.shareCount,
       artists: artists ?? this.artists,
     );
   }
@@ -57,6 +73,10 @@ class AlbumModel {
       'size': size,
       'publishTime': publishTime,
       'companyName': companyName,
+      'briefDesc': briefDesc,
+      'commentCount': commentCount,
+      'likedCount': likedCount,
+      'shareCount': shareCount,
       'artists': artists.map((x) => x.toMap()).toList(),
     };
   }
@@ -69,7 +89,11 @@ class AlbumModel {
       type: map['type'] as String,
       size: map['size'] as int,
       publishTime: map['publishTime'] as int,
-      companyName: map['companyName'] as String?,
+      companyName: (map['companyName'] ?? map['company']) as String?,
+      briefDesc: map['briefDesc'] as String?,
+      commentCount: (map['info']?['commentCount'] as int?) ?? 0,
+      likedCount: (map['info']?['likedCount'] as int?) ?? 0,
+      shareCount: (map['info']?['shareCount'] as int?) ?? 0,
       artists: List<Artist>.from(
         (map['artists'] as List).map<Artist>(
           (x) => Artist.fromMap(x as Map<String, dynamic>),

@@ -334,7 +334,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                             Obx(
                               () => IconButton(
                                 onPressed: () {
-                                  _player.toggleLoopMode();
+                                  _player.toggleLoopMode(context: context);
                                 },
                                 icon: Icon(
                                   _player.loopModeIcon.value,

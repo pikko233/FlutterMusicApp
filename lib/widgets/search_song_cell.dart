@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/utils/time_util.dart';
+import 'package:flutter_music_app/widgets/song_popup_menu.dart';
 
 class SearchSongCell extends StatelessWidget {
   final bool isPlaying;
-  final String image;
-  final String title;
-  final String subtitle;
+  final SongModel song;
+  // final String image;
+  // final String title;
+  // final String subtitle;
   final VoidCallback onPressedPlay;
-  final VoidCallback onPressedMore;
   const SearchSongCell({
     super.key,
     this.isPlaying = false,
-    required this.image,
-    required this.title,
-    required this.subtitle,
+    required this.song,
+    // required this.image,
+    // required this.title,
+    // required this.subtitle,
     required this.onPressedPlay,
-    required this.onPressedMore,
   });
 
   @override
@@ -40,7 +42,7 @@ class SearchSongCell extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              title,
+              song.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -53,7 +55,7 @@ class SearchSongCell extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        subtitle,
+        "${song.singersName} - ${song.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: song.dt))}",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -62,10 +64,11 @@ class SearchSongCell extends StatelessWidget {
           fontWeight: FontWeight.w400,
         ),
       ),
-      trailing: IconButton(
-        onPressed: onPressedMore,
-        icon: Icon(Icons.more_horiz, color: AppColors.textPrimary40),
-      ),
+      // trailing: IconButton(
+      //   onPressed: onPressedMore,
+      //   icon: Icon(Icons.more_horiz, color: AppColors.textPrimary40),
+      // ),
+      trailing: SongPopupMenu(song: song),
     );
   }
 }

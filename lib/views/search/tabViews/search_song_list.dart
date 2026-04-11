@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/debounce_util.dart';
@@ -66,13 +65,13 @@ class _SearchSongListState extends State<SearchSongList> {
               separatorBuilder: (context, index) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final item = _searchResultVM.songs[index];
-
                 return SearchSongCell(
                   isPlaying: item.id == currentSongId,
-                  image: item.picUrl,
-                  title: item.name,
-                  subtitle:
-                      "${item.singersName} - ${item.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
+                  song: item,
+                  // image: item.picUrl,
+                  // title: item.name,
+                  // subtitle:
+                  //     "${item.singersName} - ${item.al.name} • ${TimeUtil.formatDuration(Duration(milliseconds: item.dt))}",
                   onPressedPlay: () async {
                     final res = await _player.checkSong(item.id);
                     if (!res) {
@@ -86,7 +85,6 @@ class _SearchSongListState extends State<SearchSongList> {
                     );
                     Get.toNamed(AppRoutes.playerScreen);
                   },
-                  onPressedMore: () {},
                 );
               },
             ),

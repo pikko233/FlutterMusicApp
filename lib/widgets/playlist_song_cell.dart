@@ -41,12 +41,12 @@ class PlaylistSongCell extends StatelessWidget {
         ),
         child: ListTile(
           onTap: onPressedPlay,
-          contentPadding: const EdgeInsets.only(left: 15),
+          contentPadding: const EdgeInsets.only(left: 5),
           leading: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 30,
+                width: 36,
                 child: _player.currentSongId.value == song.id
                     ? const Icon(Icons.play_arrow, color: AppColors.primary)
                     : Text(
@@ -71,24 +71,17 @@ class PlaylistSongCell extends StatelessWidget {
                     ),
             ],
           ),
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  song.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _player.currentSongId.value == song.id
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+          title: Text(
+            song.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: _player.currentSongId.value == song.id
+                  ? AppColors.primary
+                  : AppColors.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           subtitle: Text(
             '${song.singersName} - ${song.al.name}',

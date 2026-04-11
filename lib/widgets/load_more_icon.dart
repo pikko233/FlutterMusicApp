@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 
 class LoadMoreIcon extends StatelessWidget {
@@ -9,7 +8,7 @@ class LoadMoreIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 60),
+      padding: const EdgeInsets.only(bottom: 60),
       child: SizedBox(
         height: 60,
         child: Center(

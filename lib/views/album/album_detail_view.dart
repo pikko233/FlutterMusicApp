@@ -1,0 +1,332 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_music_app/constants/app_colors.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/services/player_service.dart';
+import 'package:flutter_music_app/utils/count_util.dart';
+import 'package:flutter_music_app/utils/toast_util.dart';
+import 'package:flutter_music_app/viewmodels/album_detail_viewmodel.dart';
+import 'package:flutter_music_app/widgets/mini_player.dart';
+import 'package:flutter_music_app/widgets/netease_image.dart';
+import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
+class AlbumDetailView extends StatefulWidget {
+  const AlbumDetailView({super.key});
+
+  @override
+  State<AlbumDetailView> createState() => _AlbumDetailViewState();
+}
+
+class _AlbumDetailViewState extends State<AlbumDetailView> {
+  late AlbumDetailViewmodel _albumDetailVM;
+  bool _descExpanded = false; // 是否展开歌单简介
+  final _player = Get.find<PlayerService>();
+
+  @override
+  void initState() {
+    super.initState();
+    print('页面传参id:${Get.arguments['id'] ?? 0}');
+    _albumDetailVM = Get.put(
+      AlbumDetailViewmodel(id: Get.arguments['id'] ?? 0),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.sizeOf(context);
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.bgPrimary, AppColors.bgCard],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+        ),
+        child: Stack(
+          children: [
+            Obx(() {
+              if (_albumDetailVM.album.value == null ||
+                  _albumDetailVM.songs.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final album = _albumDetailVM.album.value!;
+              final songs = _albumDetailVM.songs;
+              return CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    scrolledUnderElevation: 0,
+                    leading: IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                    title: Text(
+                      "专辑",
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    actions: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.more_horiz),
+                      ),
+                    ],
+                  ),
+                  // 歌单封面、歌单简介、播放全部按钮、收藏歌单按钮
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 歌单封面
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: NeteaseImage(
+                              url: album.picUrl,
+                              width: media.width * 0.3,
+                              height: media.width * 0.3,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 专辑名称
+                                Text(
+                                  album.name,
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4), // 怎么让这行占据column的剩余空间
+                                // 歌手
+                                Text(
+                                  album.artistsName,
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary80,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+                                // 发行时间
+                                Text(
+                                  "发行时间 ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(album.publishTime))}",
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary60,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                // 专辑简介
+                                album.briefDesc == null || album.briefDesc == ''
+                                    ? const SizedBox.shrink()
+                                    : GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _descExpanded = !_descExpanded;
+                                          });
+                                        },
+                                        child: Text(
+                                          album.briefDesc!,
+                                          maxLines: _descExpanded ? null : 1,
+                                          overflow: _descExpanded
+                                              ? TextOverflow.visible
+                                              : TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: AppColors.textPrimary60,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // 喜爱、评论、分享
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          // 喜爱数量
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.favorite,
+                                  color: AppColors.textSecondary,
+                                  size: 15,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  CountUtil.formatCount(album.likedCount),
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 评论数量
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.chat,
+                                  color: AppColors.textSecondary,
+                                  size: 15,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  CountUtil.formatCount(album.commentCount),
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // 分享
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.share,
+                                  color: AppColors.textSecondary,
+                                  size: 15,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  CountUtil.formatCount(album.shareCount),
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // 列表标题
+                  SliverPadding(
+                    padding: const EdgeInsets.only(
+                      top: 10,
+                      left: 20,
+                      right: 20,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "歌曲列表",
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            "${album.size}首",
+                            style: TextStyle(
+                              color: AppColors.textPrimary80,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // 歌曲列表
+                  SliverPadding(
+                    padding: const EdgeInsets.only(
+                      top: 10,
+                      left: 20,
+                      right: 20,
+                      bottom: 80,
+                    ),
+                    sliver: SliverList.separated(
+                      itemCount: songs.length,
+                      itemBuilder: (context, index) {
+                        final item = songs[index];
+                        return PlaylistSongCell(
+                          index: index,
+                          song: item,
+                          onPressedPlay: () async {
+                            // 先判断一下音乐是否有版权
+                            final isAvailable = await _player.checkSong(
+                              item.id,
+                            );
+                            if (!isAvailable) {
+                              ToastUtil.showToast('暂无版权');
+                              return;
+                            }
+                            // 如果音乐有版权，则跳转播放播放
+                            await _player.playSong(
+                              item.id,
+                              songs,
+                              album.size,
+                              null,
+                            );
+                            Get.toNamed(AppRoutes.playerScreen);
+                          },
+                        );
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
+                    ),
+                  ),
+                ],
+              );
+            }),
+            Positioned(left: 0, right: 0, bottom: 0, child: MiniPlayer()),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: kBottomNavigationBarHeight * 0.5,
+        color: Colors.black,
+      ),
+    );
+  }
+}

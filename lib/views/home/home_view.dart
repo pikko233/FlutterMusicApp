@@ -185,19 +185,19 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
                 // 最近播放
-                SectionTitle(title: "最近常听", onPressed: () {}, showMore: false),
-                Column(
-                  spacing: 10,
-                  children: List.generate(3, (context) {
-                    return SearchSongCell(
-                      image: "assets/images/ar_4.png",
-                      title: "晴天",
-                      subtitle: "周杰伦 • 4:29",
-                      onPressedPlay: () {},
-                      onPressedMore: () {},
-                    );
-                  }),
-                ),
+                // SectionTitle(title: "最近常听", onPressed: () {}, showMore: false),
+                // Column(
+                //   spacing: 10,
+                //   children: List.generate(3, (context) {
+                //     return SearchSongCell(
+                //       image: "assets/images/ar_4.png",
+                //       title: "晴天",
+                //       subtitle: "周杰伦 • 4:29",
+                //       onPressedPlay: () {},
+                //       onPressedMore: () {},
+                //     );
+                //   }),
+                // ),
                 // 为你打造
                 SectionTitle(title: "为你打造", onPressed: () {}),
                 Container(

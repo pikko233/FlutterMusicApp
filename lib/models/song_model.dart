@@ -89,6 +89,28 @@ class SongModel {
     );
   }
 
+  // 用于解析专辑详情 /album?id=xxx 返回的歌曲格式
+  // al 字段无 picUrl，需从外部传入专辑封面 URL
+  factory SongModel.fromAlbumDetailMap(Map<String, dynamic> map, String albumPicUrl) {
+    final al = map['al'] as Map<String, dynamic>;
+    return SongModel(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      ar: List<ArtistModel>.from(
+        (map['ar'] as List<dynamic>).map<ArtistModel>(
+          (x) => ArtistModel.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      al: AlbumModel(
+        id: al['id'] as int,
+        name: al['name'] as String,
+        picUrl: albumPicUrl,
+      ),
+      dt: map['dt'] as int,
+      fee: map['fee'] as int? ?? 0,
+    );
+  }
+
   String toJson() => json.encode(toMap());
 
   factory SongModel.fromJson(String source) =>
