@@ -28,7 +28,6 @@ class SearchViewmodel extends GetxController {
   Future<void> _getSearchHot() async {
     final res = await SearchRepository.getSearchHot();
     searchHot.value = res;
-    print('热搜列表： $res');
   }
 
   // 获取搜索建议
@@ -41,7 +40,6 @@ class SearchViewmodel extends GetxController {
       return;
     }
     final res = await SearchRepository.getSearchSuggest(keywords, type: type);
-    print('搜索建议: $res');
-    searchSuggest.value = res.length > 5 ? res.sublist(0, 5) : res;
+    searchSuggest.value = res.length > 10 ? res.sublist(0, 10) : res;
   }
 }

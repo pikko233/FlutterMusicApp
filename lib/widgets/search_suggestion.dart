@@ -23,7 +23,7 @@ class SearchSuggestion extends StatelessWidget {
         color: AppColors.bgElevated,
         borderRadius: BorderRadius.circular(6),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 280),
+          constraints: const BoxConstraints(maxHeight: 560),
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: suggestions.length,

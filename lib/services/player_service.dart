@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_lyric/flutter_lyric.dart';
@@ -156,7 +157,7 @@ class PlayerService extends GetxController {
       isLoading.value = true;
       isAvailable.value = await checkSong(id); // 检查当前点击的歌曲是否有版权
       if (!isAvailable.value) return; // 没有版权就返回
-      if (currentSongId.value == id) {
+      if (currentSongId.value == id && listEquals(playlist, list)) {
         if (needPlay) {
           // 从歌单列表点击来就播放，从miniplayer迷你播放器点进来不自动播放
           play();

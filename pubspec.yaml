@@ -45,6 +45,7 @@ dependencies:
   rxdart: ^0.28.0 # 合并数据流
   carousel_slider: ^5.1.2 # 实现左右切换歌曲的轮播图效果
   flutter_lyric: ^3.0.2 # 歌词滚动组件库
+  palette_generator_master: ^1.0.1 # 从图片中提取色调
 
 dev_dependencies:
   flutter_test:
