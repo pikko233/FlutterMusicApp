@@ -8,19 +8,19 @@ class AppLyric {
   ) => LyricStyle(
     textStyle: TextStyle(
       fontSize: 16,
-      color: AppColors.textPrimary60,
+      color: AppColors.textPrimary40,
       height: 1.2,
     ),
     activeStyle: TextStyle(
-      fontSize: 18,
+      fontSize: 16,
       height: 1.2,
       color: AppColors.textPrimary80,
       fontWeight: FontWeight.w600,
     ),
     translationStyle: TextStyle(
       fontSize: 15,
-      color: AppColors.textPrimary60,
-      fontWeight: FontWeight.w500,
+      color: AppColors.textPrimary40,
+      fontWeight: FontWeight.w600,
     ),
     translationActiveColor: AppColors.textPrimary80,
     lineTextAlign: TextAlign.center,

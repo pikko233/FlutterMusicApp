@@ -200,13 +200,12 @@ class PlayerService extends GetxController {
   // 获取歌曲信息
   Future<void> _getSongDetail(int id) async {
     final res = await SongRepository.getSongDetail(id);
-    song.value = res;
-    // playlist[currentIndex].picUrl = song.value.picUrl;
     // 用详情接口返回的专辑封面更新 playlist 对应项（type=1 搜索结果无 picUrl）
     final index = playlist.indexWhere((s) => s.id == id);
     if (index != -1 && playlist[index].picUrl.isEmpty) {
       playlist[index] = playlist[index].copyWith(al: res.al);
     }
+    song.value = res;
   }
 
   // 检查歌曲是否有版权

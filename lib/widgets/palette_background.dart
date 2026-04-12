@@ -83,9 +83,12 @@ class _PaletteBackgroundState extends State<PaletteBackground> {
 
       // 优先取主导色，让封面氛围感更强
       final mainColor =
-          palette.lightVibrantColor?.color ??
-          palette.dominantColor?.color ??
-          palette.vibrantColor?.color ??
+          _ensureReadable(
+            palette.lightVibrantColor?.color ??
+                palette.dominantColor?.color ??
+                palette.vibrantColor?.color ??
+                widget.fallbackColors[0],
+          ) ??
           widget.fallbackColors[0];
 
       // 顶部
@@ -124,21 +127,26 @@ class _PaletteBackgroundState extends State<PaletteBackground> {
         final lyric1 =
             palette.lightVibrantColor?.color ??
             palette.vibrantColor?.color ??
-            palette.lightMutedColor?.color;
+            palette.lightMutedColor?.color ??
+            palette.dominantColor?.color;
         final lyric2 =
+            palette.lightVibrantColor?.color ??
             palette.vibrantColor?.color ??
             palette.lightMutedColor?.color ??
             palette.dominantColor?.color;
 
         PaletteBackground.lyricGradientNotifier.value = LinearGradient(
           colors: [
-            _ensureReadable(lyric1) ?? const Color(0xFF42e695),
-            _ensureReadable(lyric2) ?? const Color(0xFF3bb2b8),
+            _ensureReadable(lyric1, minLightness: 0.8) ??
+                const Color(0xFF42e695),
+            _ensureReadable(lyric2, minLightness: 0.8) ??
+                const Color(0xFF3bb2b8),
           ],
         );
       }
-    } catch (_) {
-      // 提取失败静默降级到兜底色
+    } catch (e) {
+      // 打印错误信息
+      print('paletteBackground: $e');
     }
   }
 

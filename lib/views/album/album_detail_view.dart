@@ -4,6 +4,7 @@ import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
+import 'package:flutter_music_app/utils/netease_image_util.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:flutter_music_app/viewmodels/album_detail_viewmodel.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
@@ -96,7 +97,7 @@ class _AlbumDetailViewState extends State<AlbumDetailView> {
                             return Material(
                               color: Colors.transparent,
                               child: PaletteBackground(
-                                imageProvider: CachedNetworkImageProvider(
+                                imageProvider: NeteaseImageUtil.provider(
                                   album.picUrl,
                                 ),
                                 child: Column(

@@ -6,6 +6,7 @@ import 'package:flutter_lyric/widgets/lyric_view.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_lyric.dart';
 import 'package:flutter_music_app/services/player_service.dart';
+import 'package:flutter_music_app/utils/netease_image_util.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/palette_background.dart';
@@ -74,19 +75,8 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
           stream: _player.playerStateStream,
           builder: (context, snapshot) {
             final isPlaying = _player.isPlaying.value; // 当前歌曲正在播放 且 未播放完毕
-            return
-            // Container(
-            //   // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            //   decoration: BoxDecoration(
-            //     gradient: LinearGradient(
-            //       colors: [AppColors.bgPrimary, AppColors.bgAppBar],
-            //       begin: Alignment.bottomCenter,
-            //       end: Alignment.topCenter,
-            //     ),
-            //   ),
-            //   child:
-            PaletteBackground(
-              imageProvider: CachedNetworkImageProvider(song.picUrl),
+            return PaletteBackground(
+              imageProvider: NeteaseImageUtil.provider(song.picUrl),
               child: CustomScrollView(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
