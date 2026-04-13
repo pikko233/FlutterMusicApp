@@ -75,9 +75,13 @@ class _SearchArtistListState extends State<SearchArtistList> {
                   title: item.name,
                   subtitle: "${item.musicSize}首歌曲",
                   onPressed: () {
-                    Get.toNamed(AppRoutes.singerDetail);
+                    Get.toNamed(
+                      AppRoutes.artistDetail,
+                      arguments: {'id': item.id},
+                    );
                   },
                   onPressedSub: () {
+                    // TODO 关注歌手
                     print('点击关注歌手');
                   },
                 );

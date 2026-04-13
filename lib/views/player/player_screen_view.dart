@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lyric/widgets/lyric_view.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_lyric.dart';
+import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/netease_image_util.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
@@ -292,16 +293,24 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                                     ),
                                                   ),
                                                   const SizedBox(height: 5),
-                                                  SizedBox(
-                                                    height: 18,
-                                                    child: CustomMarquee(
-                                                      text: song.artistsName,
-                                                      style: TextStyle(
-                                                        color: AppColors
-                                                            .textPrimary60,
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                  GestureDetector(
+                                                    onTap: () => Get.toNamed(
+                                                      AppRoutes.artistDetail,
+                                                      arguments: {
+                                                        'id': song.ar[0].id,
+                                                      },
+                                                    ),
+                                                    child: SizedBox(
+                                                      height: 18,
+                                                      child: CustomMarquee(
+                                                        text: song.artistsName,
+                                                        style: TextStyle(
+                                                          color: AppColors
+                                                              .textPrimary60,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -384,7 +393,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                       },
                                       icon: Icon(
                                         _player.loopModeIcon.value,
-                                        color: AppColors.textSecondary,
+                                        color: AppColors.textPrimary60,
                                         size: 25,
                                       ),
                                     ),
@@ -454,7 +463,7 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                     },
                                     icon: Icon(
                                       Icons.format_list_bulleted,
-                                      color: AppColors.textSecondary,
+                                      color: AppColors.textPrimary60,
                                       size: 25,
                                     ),
                                   ),

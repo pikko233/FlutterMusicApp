@@ -30,12 +30,13 @@ class _MiniPlayerState extends State<MiniPlayer> {
         return SizedBox.shrink();
       }
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.black, Colors.black87, Colors.transparent],
+            colors: [AppColors.bgPrimary, Colors.transparent],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
+            stops: [0.3, 1],
           ),
         ),
         child: Column(
@@ -50,11 +51,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
               child: ListTile(
                 onTap: () {
                   Get.toNamed(
-                    AppRoutes.playerScreen,
-                    arguments: {
-                      'id': song.id,
-                      'needPlay': false,
-                    }, // 从迷你播放器跳转至播放详情时，不自动播放歌曲
+                    AppRoutes.playerScreen, // 从迷你播放器跳转至播放详情时，不自动播放歌曲
                   );
                 },
                 dense: true,

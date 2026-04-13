@@ -88,6 +88,7 @@ class _PaletteBackgroundState extends State<PaletteBackground> {
                 palette.dominantColor?.color ??
                 palette.vibrantColor?.color ??
                 widget.fallbackColors[0],
+            minLightness: 0.3,
           ) ??
           widget.fallbackColors[0];
 
@@ -126,11 +127,13 @@ class _PaletteBackgroundState extends State<PaletteBackground> {
         // 通知歌词颜色监听者，优先亮色系，亮度不足时强制提亮到 0.6
         final lyric1 =
             palette.lightVibrantColor?.color ??
+            palette.dominantColor?.color ??
             palette.vibrantColor?.color ??
             palette.lightMutedColor?.color ??
             palette.dominantColor?.color;
         final lyric2 =
             palette.lightVibrantColor?.color ??
+            palette.dominantColor?.color ??
             palette.vibrantColor?.color ??
             palette.lightMutedColor?.color ??
             palette.dominantColor?.color;

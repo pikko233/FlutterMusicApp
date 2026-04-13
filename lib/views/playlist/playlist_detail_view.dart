@@ -392,10 +392,10 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        height: kBottomNavigationBarHeight * 0.5,
-        color: Colors.black,
-      ),
+      // bottomNavigationBar: Container(
+      //   height: kBottomNavigationBarHeight * 0.5,
+      //   color: Colors.black,
+      // ),
     );
   }
 }

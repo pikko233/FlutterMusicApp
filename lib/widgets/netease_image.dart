@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class NeteaseImage extends StatelessWidget {
@@ -28,6 +29,12 @@ class NeteaseImage extends StatelessWidget {
         'Referer': 'https://music.163.com',
         'User-Agent':
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+      errorWidget: (context, string, obj) {
+        return Container(
+          color: Colors.grey[900],
+          child: const Icon(Icons.music_note, color: Colors.white54),
+        );
       },
     );
   }

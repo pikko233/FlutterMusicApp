@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
@@ -56,12 +57,21 @@ class _AlbumDetailViewState extends State<AlbumDetailView> {
 
         return Stack(
           children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.bgCard, AppColors.bgPrimary],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [kToolbarHeight / media.height, 1],
+                ),
+              ),
+            ),
             CustomScrollView(
               slivers: [
                 SliverAppBar(
                   pinned: true,
                   scrolledUnderElevation: 0,
-                  backgroundColor: Colors.transparent,
                   leading: IconButton(
                     onPressed: () => Get.back(),
                     icon: const Icon(Icons.arrow_back),
@@ -229,28 +239,34 @@ class _AlbumDetailViewState extends State<AlbumDetailView> {
                                     ),
                                   ),
                                   // 歌手
-                                  RichText(
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: '歌手: ',
-                                          style: TextStyle(
-                                            color: AppColors.textPrimary60,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                  GestureDetector(
+                                    onTap: () => Get.toNamed(
+                                      AppRoutes.artistDetail,
+                                      arguments: {'id': album.artists[0].id},
+                                    ),
+                                    child: RichText(
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: '歌手: ',
+                                            style: TextStyle(
+                                              color: AppColors.textPrimary60,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                        ),
-                                        TextSpan(
-                                          text: album.artistsName,
-                                          style: TextStyle(
-                                            color: AppColors.textPrimary80,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
+                                          TextSpan(
+                                            text: album.artistsName,
+                                            style: TextStyle(
+                                              color: AppColors.textPrimary80,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   // 发行时间
@@ -435,10 +451,6 @@ class _AlbumDetailViewState extends State<AlbumDetailView> {
           ],
         );
       }),
-      bottomNavigationBar: Container(
-        height: kBottomNavigationBarHeight * 0.5,
-        color: Colors.black,
-      ),
     );
   }
 }
