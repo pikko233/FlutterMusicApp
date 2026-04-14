@@ -44,6 +44,7 @@ class _SearchViewState extends State<SearchView> {
   @override
   void dispose() {
     _focusNode.dispose();
+    _debounceUtil.dispose();
     super.dispose();
   }
 

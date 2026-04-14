@@ -256,14 +256,16 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 80.0),
-                      child: InkWell(
-                        onTap: () {
-                          print('查看全部歌曲');
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () => Get.toNamed(
+                              AppRoutes.artistSongs,
+                              arguments: {'id': artist.id},
+                            ),
+                            child: Text(
                               '查看全部歌曲',
                               style: TextStyle(
                                 color: AppColors.textPrimary60,
@@ -271,14 +273,14 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(width: 2),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              color: AppColors.textPrimary60,
-                              size: 15,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.textPrimary60,
+                            size: 15,
+                          ),
+                        ],
                       ),
                     ),
                   ),

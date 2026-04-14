@@ -3,7 +3,7 @@ import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/repositories/playlist_repository.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
-import 'package:flutter_music_app/utils/debounce_util.dart';
+import 'package:flutter_music_app/utils/throttle_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/widgets/load_more_icon.dart';
 import 'package:flutter_music_app/widgets/search_playlist_cell.dart';
@@ -21,7 +21,7 @@ class _SearchPlaylistListState extends State<SearchPlaylistList> {
   final _searchResultVM = Get.find<SearchResultViewmodel>();
   final _player = Get.find<PlayerService>();
   final _scrollController = ScrollController();
-  final _debounceUtil = DebounceUtil();
+  final _throttleUtil = ThrottleUtil();
 
   @override
   void initState() {
@@ -32,9 +32,16 @@ class _SearchPlaylistListState extends State<SearchPlaylistList> {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
         // 页面触底加载歌单下一页数据
-        _debounceUtil.debounce(() => _searchResultVM.loadMorePlaylists());
+        _throttleUtil.throttle(() => _searchResultVM.loadMorePlaylists());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _throttleUtil.dispose();
+    super.dispose();
   }
 
   @override

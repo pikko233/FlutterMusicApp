@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
-import 'package:flutter_music_app/utils/debounce_util.dart';
+import 'package:flutter_music_app/utils/throttle_util.dart';
 import 'package:flutter_music_app/utils/time_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/widgets/load_more_icon.dart';
@@ -20,7 +20,7 @@ class _SearchSongListState extends State<SearchSongList> {
   final _searchResultVM = Get.find<SearchResultViewmodel>();
   final _player = Get.find<PlayerService>();
   final _scrollController = ScrollController();
-  final _debounce = DebounceUtil();
+  final _throttleUtil = ThrottleUtil();
 
   @override
   void initState() {
@@ -30,9 +30,16 @@ class _SearchSongListState extends State<SearchSongList> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
-        _debounce.debounce(() => _searchResultVM.loadMoreSongs());
+        _throttleUtil.throttle(() => _searchResultVM.loadMoreSongs());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _throttleUtil.dispose();
+    super.dispose();
   }
 
   @override

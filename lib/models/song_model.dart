@@ -89,6 +89,32 @@ class SongModel {
     );
   }
 
+  // 用于解析 /artist/songs 返回的歌曲格式
+  // al 字段无 picUrl，使用 pic_str 构建封面 URL
+  factory SongModel.fromArtistSongsMap(Map<String, dynamic> map) {
+    final al = map['al'] as Map<String, dynamic>;
+    final picStr = al['pic_str'] as String?;
+    final picUrl = picStr != null
+        ? 'https://p2.music.126.net/$picStr/${al['id']}.jpg'
+        : '';
+    return SongModel(
+      id: map['id'] as int,
+      name: map['name'] as String,
+      ar: List<Artist>.from(
+        (map['ar'] as List<dynamic>).map<Artist>(
+          (x) => Artist.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      al: Album(
+        id: al['id'] as int,
+        name: al['name'] as String,
+        picUrl: picUrl,
+      ),
+      dt: map['dt'] as int,
+      fee: map['fee'] as int? ?? 0,
+    );
+  }
+
   // 用于解析专辑详情 /album?id=xxx 返回的歌曲格式
   // al 字段无 picUrl，需从外部传入专辑封面 URL
   factory SongModel.fromAlbumDetailMap(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
-import 'package:flutter_music_app/utils/debounce_util.dart';
+import 'package:flutter_music_app/utils/throttle_util.dart';
 import 'package:flutter_music_app/viewmodels/search_result_viewmodel.dart';
 import 'package:flutter_music_app/widgets/load_more_icon.dart';
 import 'package:flutter_music_app/widgets/search_album_cell.dart';
@@ -17,7 +17,7 @@ class SearchAlbumList extends StatefulWidget {
 class _SearchAlbumListState extends State<SearchAlbumList> {
   final _searchResultVM = Get.find<SearchResultViewmodel>();
   final _scrollController = ScrollController();
-  final _debounceUtil = DebounceUtil();
+  final _throttleUtil = ThrottleUtil();
 
   @override
   void initState() {
@@ -26,9 +26,16 @@ class _SearchAlbumListState extends State<SearchAlbumList> {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent - 100) {
-        _debounceUtil.debounce(() => _searchResultVM.loadMoreAlbums());
+        _throttleUtil.throttle(() => _searchResultVM.loadMoreAlbums());
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _throttleUtil.dispose();
+    super.dispose();
   }
 
   @override

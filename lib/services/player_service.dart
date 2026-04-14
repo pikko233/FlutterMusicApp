@@ -202,7 +202,7 @@ class PlayerService extends GetxController {
     final res = await SongRepository.getSongDetail(id);
     // 用详情接口返回的专辑封面更新 playlist 对应项（type=1 搜索结果无 picUrl）
     final index = playlist.indexWhere((s) => s.id == id);
-    if (index != -1 && playlist[index].picUrl.isEmpty) {
+    if (index != -1) {
       playlist[index] = playlist[index].copyWith(al: res.al);
     }
     song.value = res;

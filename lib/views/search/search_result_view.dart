@@ -125,6 +125,7 @@ class _SearchResultViewState extends State<SearchResultView>
     _searchController.dispose();
     _tabController.dispose();
     _focusNode.dispose();
+    _debounceUtil.dispose();
     super.dispose();
   }
 

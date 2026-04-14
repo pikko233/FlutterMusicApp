@@ -51,9 +51,10 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.bgPrimary, AppColors.bgCard],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
+            colors: [AppColors.bgCard, AppColors.bgPrimary],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [kToolbarHeight / media.height, 1],
           ),
         ),
         child: Stack(
@@ -71,6 +72,7 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
                   SliverAppBar(
                     pinned: true,
                     scrolledUnderElevation: 0,
+                    elevation: 0,
                     leading: IconButton(
                       onPressed: () {
                         Get.back();
@@ -392,10 +394,6 @@ class _PlaylistDetailViewState extends State<PlaylistDetailView> {
           ],
         ),
       ),
-      // bottomNavigationBar: Container(
-      //   height: kBottomNavigationBarHeight * 0.5,
-      //   color: Colors.black,
-      // ),
     );
   }
 }
