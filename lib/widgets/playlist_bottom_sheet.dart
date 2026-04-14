@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
-import 'package:get/get_instance/get_instance.dart';
 import 'package:get/state_manager.dart';
 
 class PlaylistBottomSheet extends StatefulWidget {

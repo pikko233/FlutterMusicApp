@@ -208,7 +208,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                             ),
                           ),
                           Text(
-                            "50首",
+                            "${topSongs.length}首",
                             style: TextStyle(
                               color: AppColors.textPrimary80,
                               fontSize: 13,

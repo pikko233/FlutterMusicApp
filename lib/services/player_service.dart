@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_lyric/flutter_lyric.dart';
+import 'package:flutter_music_app/models/artist_detail_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
+import 'package:flutter_music_app/repositories/artist_repository.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:get/get.dart' hide Rx;
 
@@ -42,6 +44,8 @@ class PlayerService extends GetxController {
     LoopMode.all: '循环播放',
   };
   final volumn = 1.0.obs; // 播放器音量（非系统音量，ios不允许app直接修改系统音量）
+  final artists =
+      <ArtistDetailModel>[].obs; // 当前歌曲有多位歌手的时候，需要批量请求，获取每位歌手的头像以及当前用户是否关注的字段
 
   bool get hasMore => playlist.length < songTotalCount.value;
 
@@ -202,10 +206,12 @@ class PlayerService extends GetxController {
     final res = await SongRepository.getSongDetail(id);
     // 用详情接口返回的专辑封面更新 playlist 对应项（type=1 搜索结果无 picUrl）
     final index = playlist.indexWhere((s) => s.id == id);
-    if (index != -1) {
+    if (index != -1 && res.al.picUrl.isNotEmpty) {
       playlist[index] = playlist[index].copyWith(al: res.al);
     }
     song.value = res;
+    final ids = song.value!.ar.map((e) => e.id).toList();
+    _getArtistsDetail(ids);
   }
 
   // 检查歌曲是否有版权
@@ -383,6 +389,21 @@ class PlayerService extends GetxController {
   Future<void> setVolumn(double value) async {
     await _audioPlayer.setVolume(value);
     volumn.value = value;
+  }
+
+  // 批量获取歌手的信息
+  Future<void> _getArtistsDetail(List<int> ids) async {
+    final results = await Future.wait(
+      ids.map((id) => ArtistRepository.getArtistDetail(id)),
+    );
+    artists.value = results
+        .map(
+          (res) => ArtistDetailModel.fromMap(
+            res['artist'] as Map<String, dynamic>,
+            videoCount: res['videoCount'] as int,
+          ),
+        )
+        .toList();
   }
 }
 

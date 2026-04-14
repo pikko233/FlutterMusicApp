@@ -8,6 +8,7 @@ import 'package:flutter_music_app/constants/app_lyric.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/netease_image_util.dart';
+import 'package:flutter_music_app/widgets/artist_bottom_sheet.dart';
 import 'package:flutter_music_app/widgets/custom_marquee.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/palette_background.dart';
@@ -66,12 +67,12 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
     final media = MediaQuery.sizeOf(context);
 
     return Scaffold(
-      // appBar: AppBar(),
       body: Obx(() {
         if (_player.song.value == null) {
           return Center(child: CircularProgressIndicator());
         }
         final song = _player.song.value!;
+        final artists = _player.artists;
         return StreamBuilder<PlayerState>(
           stream: _player.playerStateStream,
           builder: (context, snapshot) {
@@ -294,12 +295,28 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                                   ),
                                                   const SizedBox(height: 5),
                                                   GestureDetector(
-                                                    onTap: () => Get.toNamed(
-                                                      AppRoutes.artistDetail,
-                                                      arguments: {
-                                                        'id': song.ar[0].id,
-                                                      },
-                                                    ),
+                                                    onTap: () {
+                                                      if (artists.length == 1) {
+                                                        Get.toNamed(
+                                                          AppRoutes
+                                                              .artistDetail,
+                                                          arguments: {
+                                                            'id': artists[0].id,
+                                                          },
+                                                        );
+                                                      } else {
+                                                        showModalBottomSheet(
+                                                          context: context,
+                                                          isScrollControlled:
+                                                              true, // 允许bottomSheet高度超过50%
+                                                          builder: (context) {
+                                                            return ArtistBottomSheet(
+                                                              artists: artists,
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    },
                                                     child: SizedBox(
                                                       height: 18,
                                                       child: CustomMarquee(
@@ -493,9 +510,8 @@ class _PlayerScreenViewState extends State<PlayerScreenView> {
                                       baseBarColor: Colors.white.withValues(
                                         alpha: 0.12,
                                       ),
-                                      thumbColor: Colors.white.withValues(
-                                        alpha: 0.8,
-                                      ),
+                                      thumbColor: Colors.transparent,
+                                      thumbGlowColor: Colors.transparent,
                                       thumbRadius: 8.0,
                                       barHeight: 4.0,
                                       timeLabelLocation: TimeLabelLocation.none,
