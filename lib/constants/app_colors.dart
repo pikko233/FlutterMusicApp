@@ -10,12 +10,13 @@ class AppColors {
   static const Color bgSecondary = Color(0xFF1A1A2E); // 次级背景
   static const Color bgCard = Color(0xFF1E1E30); // 卡片/列表项背景
   static const Color bgElevated = Color(0xFF252540); // 弹窗/底部导航
-  static const Color bgAppBar = Color(0xFF1A0A2E);
+  static const Color bgAppBar = Color(0xFF1A0A2E); // 播放页顶部的氛围色
 
   // === 主色 (Indigo/Purple) ===
   static const Color primary = Color(0xFF6C63FF); // 主色调
   static const Color primaryLight = Color(0xFF8B84FF);
   static const Color primaryDark = Color(0xFF4A42DD);
+  static const Color primaryAuth = Color(0xFF7C3BEB); // 登录页的色调
 
   // === 强调色 ===
   static const Color accent1 = Color(0xFFEC4899); // 粉紫 (like/热门)

@@ -3,7 +3,6 @@ import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/utils/count_util.dart';
 import 'package:flutter_music_app/viewmodels/home_viewmodel.dart';
-import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:flutter_music_app/widgets/section_title.dart';
 import 'package:flutter_music_app/widgets/playlist_card.dart';
 import 'package:get/get.dart';
@@ -23,59 +22,63 @@ class _HomeViewState extends State<HomeView> {
       slivers: [
         SliverAppBar(
           pinned: true,
-          toolbarHeight: kToolbarHeight * 1.2,
+          toolbarHeight: kToolbarHeight * 1,
           backgroundColor: AppColors.bgCard,
           elevation: 0,
           scrolledUnderElevation: 0,
           flexibleSpace: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+            padding: const EdgeInsets.only(left: 20.0, right: 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent4,
-                        borderRadius: BorderRadius.circular(25),
+                GestureDetector(
+                  onTap: () => Get.toNamed(AppRoutes.auth),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: kToolbarHeight * 0.6,
+                        height: kToolbarHeight * 0.6,
+                        decoration: BoxDecoration(
+                          color: AppColors.accent4,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Center(child: Icon(Icons.person)),
+                        // child: Align(
+                        //   child: Text(
+                        //     "G",
+                        //     style: TextStyle(
+                        //       color: AppColors.textPrimary,
+                        //       fontSize: 18,
+                        //       fontWeight: FontWeight.w700,
+                        //     ),
+                        //   ),
+                        // ),
                       ),
-                      child: Align(
-                        child: Text(
-                          "Z",
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
+                      const SizedBox(width: 15),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "游客",
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
+                          Text(
+                            "登陆后享受更多功能～",
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "晚上好~",
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          "你想听点什么？",
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
               ],

@@ -8,4 +8,5 @@ abstract class AppRoutes {
   static const highQualityPlaylist = '/more_playlist'; // 更多歌单页面
   static const albumDetail = '/album_detail'; // 专辑详情页
   static const artistSongs = '/artist_songs'; // 歌手全部歌曲
+  static const auth = '/auth'; // 登陆/注册
 }

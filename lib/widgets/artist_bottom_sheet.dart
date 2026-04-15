@@ -52,6 +52,7 @@ class ArtistBottomSheet extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                // TODO 未登录时，歌手详情api没有返回是否关注的字段，等做完登录功能后再回来看看
                 trailing: ElevatedButton.icon(
                   onPressed: () {
                     print('点击关注歌手: ${item.id}');
