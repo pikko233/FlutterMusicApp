@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_music_app/constants/app_config.dart';
+import 'package:flutter_music_app/utils/toast_util.dart';
 
 class Request {
   static final _dio =
@@ -23,12 +25,17 @@ class Request {
               if (response.data?['code'] == 200) {
                 return handler.next(response);
               } else {
+                ToastUtil.showToast(response.data?['message'] ?? '操作失败');
                 handler.reject(
                   DioException(requestOptions: response.requestOptions),
                 );
               }
             },
-            onError: (error, handler) => handler.next(error),
+            onError: (error, handler) {
+              print('error: $error');
+              ToastUtil.showToast(error.response?.data?['message'] ?? '操作失败');
+              handler.next(error);
+            },
           ),
         ]);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/utils/global_keys.dart';
 import 'package:flutter_music_app/constants/app_theme.dart';
 import 'package:flutter_music_app/views/album/album_detail_view.dart';
 import 'package:flutter_music_app/views/artist/artist_songs_view.dart';
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Music App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      scaffoldMessengerKey: GlobalKeys.scaffoldMessengerKey,
       initialRoute: AppRoutes.splash,
       getPages: [
         GetPage(name: AppRoutes.splash, page: () => const SplashView()),

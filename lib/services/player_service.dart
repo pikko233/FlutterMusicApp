@@ -303,7 +303,7 @@ class PlayerService extends GetxController {
     _loopMode = modes[nextIndex];
     loopModeIcon.value = _loopModeIconMap[_loopMode];
     if (context != null) {
-      ToastUtil.showToast2(context, _loopToastMap[_loopMode]!);
+      ToastUtil.showToast(_loopToastMap[_loopMode]!);
     }
   }
 
