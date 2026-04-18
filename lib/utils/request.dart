@@ -1,9 +1,19 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_music_app/constants/app_config.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
+import 'package:flutter_music_app/utils/user_storage.dart';
 
 class Request {
+  static String? _cookie;
+
+  static Future<void> init() async {
+    _cookie = await UserStorage.getCookie();
+  }
+
+  static void setCookie(String cookie) {
+    _cookie = cookie;
+  }
+
   static final _dio =
       Dio(
           BaseOptions(
@@ -15,12 +25,11 @@ class Request {
           ),
         )
         ..interceptors.addAll([
-          LogInterceptor(
-            requestBody: true,
-            responseBody: true,
-          ), // 打印请求信息和响应信息，方便调试
           InterceptorsWrapper(
-            onRequest: (options, handler) => handler.next(options),
+            onRequest: (options, handler) {
+              if (_cookie != null) options.headers['Cookie'] = _cookie;
+              handler.next(options);
+            },
             onResponse: (response, handler) {
               if (response.data?['code'] == 200) {
                 return handler.next(response);
@@ -48,5 +57,31 @@ class Request {
 
   static Future<Response> post(String path, {dynamic data}) async {
     return await _dio.post(path, data: data);
+  }
+
+  // 不经过 code 拦截器，用于 QR 轮询等需要读取非 200 状态码的接口
+  static final _rawDio =
+      Dio(
+          BaseOptions(
+            baseUrl: AppConfig.baseUrl,
+            connectTimeout: const Duration(milliseconds: 10000),
+            receiveTimeout: const Duration(milliseconds: 10000),
+          ),
+        )
+        ..interceptors.addAll([
+          LogInterceptor(requestBody: true, responseBody: true),
+          InterceptorsWrapper(
+            onRequest: (options, handler) {
+              if (_cookie != null) options.headers['Cookie'] = _cookie;
+              handler.next(options);
+            },
+          ),
+        ]);
+
+  static Future<Response> getRaw(
+    String path, {
+    Map<String, dynamic>? params,
+  }) async {
+    return await _rawDio.get(path, queryParameters: params);
   }
 }

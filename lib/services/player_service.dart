@@ -8,6 +8,7 @@ import 'package:flutter_music_app/models/artist_detail_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/repositories/artist_repository.dart';
 import 'package:flutter_music_app/utils/toast_util.dart';
+import 'package:flutter_music_app/utils/user_storage.dart';
 import 'package:get/get.dart' hide Rx;
 
 import 'package:flutter_music_app/repositories/song_repository.dart';
@@ -30,6 +31,7 @@ class PlayerService extends GetxController {
   _loadMoreCallback; // 加载更多歌曲的回调，不同来源（歌单/搜索）传入不同实现
   final playlist =
       <SongModel>[].obs; // 当前播放列表（分页加载，可能不包含所有歌）, 列表api不返回音频资源url字段
+  final recentSongs = <SongModel>[].obs; // 最近播放列表
   final songTotalCount = 0.obs; // 播放列表歌曲总数（包含所有分页）
   LoopMode _loopMode = LoopMode.all; // 当前歌曲播放循环模式
   final loopModeIcon = Rxn<IconData>(Icons.repeat); // 循环模式icon
@@ -78,6 +80,9 @@ class PlayerService extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    // 从缓存中拿到最近播放歌曲
+    UserStorage.getRecentSongs().then((songs) => recentSongs.assignAll(songs));
 
     // 实例化播放器
     _audioPlayer = AudioPlayer();
@@ -210,6 +215,10 @@ class PlayerService extends GetxController {
       playlist[index] = playlist[index].copyWith(al: res.al);
     }
     song.value = res;
+    print('将当前歌曲存入缓存');
+    UserStorage.saveRecentSong(res); // 将当前播放歌曲存入缓存
+    recentSongs.value = (await UserStorage.getRecentSongs()).toList();
+
     final ids = song.value!.ar.map((e) => e.id).toList();
     _getArtistsDetail(ids);
   }

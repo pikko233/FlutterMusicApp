@@ -15,13 +15,33 @@ class AuthView extends StatefulWidget {
 
 class _AuthViewState extends State<AuthView> {
   final _gestureRecognizer = TapGestureRecognizer();
-  int _currentIndex = 0; // 0-登录页，1-注册页
+  bool _isLogin = true; // true-登录页，false-注册页
   final _authVM = Get.put(AuthViewmodel());
 
-  void _handleLogin(String phone, String password) {
-    // TODO 调用登录接口
-    print('$phone, $password');
-    _authVM.login(phone, password, md5_password: password);
+  void _handleCaptchaLogin(String phone, String captcha) {
+    _authVM.captchaLogin(phone, captcha);
+  }
+
+  Future<void> _handleSendCaptcha(String phone) async {
+    await _authVM.sendCaptcha(phone);
+  }
+
+  Future<String> _handleGetQrKey() => _authVM.getQrKey();
+  Future<String> _handleCreateQrCode(String key) => _authVM.createQrCode(key);
+  Future<Map<String, dynamic>> _handleCheckQrStatus(String key) =>
+      _authVM.checkQrStatus(key);
+
+  void _handleEmailLogin(String email, String password) {
+    _authVM.loginByEmail(email, password);
+  }
+
+  void _handleQrLoginSuccess(Map<String, dynamic> result) {
+    print('二维码登录成功: $result');
+    // TODO: 存储 cookie/用户信息
+  }
+
+  Future<void> _handleGuestLogin() async {
+    await _authVM.guestLogin();
   }
 
   void _handleRegister(String phone, String password) {
@@ -68,8 +88,9 @@ class _AuthViewState extends State<AuthView> {
               top: media.height * 0.1,
             ),
             child: Column(
-              spacing: 10,
+              spacing: 16,
               children: [
+                Row(),
                 Container(
                   width: media.width * 0.2,
                   height: media.width * 0.2,
@@ -114,38 +135,52 @@ class _AuthViewState extends State<AuthView> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                  child: _currentIndex == 0
-                      ? LoginForm(onLogin: _handleLogin)
-                      : RegisterForm(onRegister: _handleRegister),
+                _isLogin
+                    ? LoginForm(
+                        onCaptchaLogin: _handleCaptchaLogin,
+                        onSendCaptcha: _handleSendCaptcha,
+                        onGetQrKey: _handleGetQrKey,
+                        onCreateQrCode: _handleCreateQrCode,
+                        onCheckQrStatus: _handleCheckQrStatus,
+                        onQrLoginSuccess: _handleQrLoginSuccess,
+                        onEmailLogin: _handleEmailLogin,
+                      )
+                    : RegisterForm(onRegister: _handleRegister),
+
+                GestureDetector(
+                  onTap: _handleGuestLogin,
+                  child: Text(
+                    '游客登录',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
                 RichText(
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: _currentIndex == 0 ? '还没有账号？' : '已经有账号？',
+                        text: _isLogin ? '还没有账号？' : '已经有账号？',
                         style: TextStyle(
                           color: AppColors.textPrimary40,
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       TextSpan(
-                        text: _currentIndex == 0 ? '立即注册' : '立即登录',
+                        text: _isLogin ? '立即注册' : '立即登录',
                         style: TextStyle(
                           color: AppColors.primary,
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                         recognizer: _gestureRecognizer
                           ..onTap = () {
                             // print('跳转注册页');
                             setState(() {
-                              _currentIndex = _currentIndex == 0 ? 1 : 0;
+                              _isLogin = !_isLogin;
                             });
                           },
                       ),

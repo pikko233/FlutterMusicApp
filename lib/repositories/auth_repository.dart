@@ -1,31 +1,63 @@
 import 'package:flutter_music_app/utils/request.dart';
+import 'package:flutter_music_app/utils/user_storage.dart';
 
 class AuthRepository {
-  // 登录接口
-  // 必选参数 :
-  // phone: 手机号码
-  // password: 密码
-  // 可选参数 :
-  // countrycode: 国家码，用于国外手机号登录，例如美国传入：1
-  // md5_password: md5 加密后的密码,传入后 password 参数将失效
-  // captcha: 验证码,使用 /captcha/sent接口传入手机号获取验证码,调用此接口传入验证码,可使用验证码登录,传入后 password 参数将失效
-  static Future<dynamic> login(
-    String phone,
-    String password, {
-    int? countrycode,
-    String? md5_password,
-    String? captcha,
-  }) async {
+  // 手机验证码登录
+  static Future<dynamic> captchaLogin(String phone, String captcha) async {
     final res = await Request.post(
       '/login/cellphone',
-      data: {
-        'phone': phone,
-        'password': password,
-        'countrycode': countrycode,
-        'md5_password': md5_password,
-        'captcha': captcha,
+      data: {'phone': phone, 'captcha': captcha},
+    );
+    return res.data;
+  }
+
+  // 使用邮箱登录（只传 md5_password，避免明文密码与 hash 同时出现导致 502）
+  static Future<dynamic> loginByEmail(String email, String md5Password) async {
+    final res = await Request.post(
+      '/login',
+      data: {'email': email, 'md5_password': md5Password},
+    );
+    return res.data;
+  }
+
+  static Future<dynamic> sendCaptcha(String phone) async {
+    final res = await Request.get('/captcha/sent', params: {'phone': phone});
+    return res.data;
+  }
+
+  static Future<String> getQrKey() async {
+    final res = await Request.get(
+      '/login/qr/key',
+      params: {'timestamp': DateTime.now().millisecondsSinceEpoch},
+    );
+    return res.data['data']['unikey'] as String;
+  }
+
+  static Future<String> createQrCode(String key) async {
+    final res = await Request.getRaw(
+      '/login/qr/create',
+      params: {
+        'key': key,
+        'qrimg': true,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
       },
     );
+    return res.data['data']['qrimg'] as String;
+  }
+
+  // 返回 { code, message, cookie }
+  // 800: 过期  801: 等待扫码  802: 待确认  803: 登录成功
+  static Future<Map<String, dynamic>> checkQrStatus(String key) async {
+    final res = await Request.getRaw(
+      '/login/qr/check',
+      params: {'key': key, 'timestamp': DateTime.now().millisecondsSinceEpoch},
+    );
+    return Map<String, dynamic>.from(res.data);
+  }
+
+  // 游客登录
+  static Future<dynamic> guestLogin() async {
+    final res = await Request.post('/register/anonimous');
     return res.data;
   }
 }
