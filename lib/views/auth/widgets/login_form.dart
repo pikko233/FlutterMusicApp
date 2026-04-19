@@ -117,7 +117,6 @@ class _LoginFormState extends State<LoginForm> {
         ],
       );
     }
-
     return Form(
       key: _formKey,
       child: Column(

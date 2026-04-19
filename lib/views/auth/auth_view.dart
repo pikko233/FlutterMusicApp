@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
-import 'package:flutter_music_app/viewmodels/auth_viewmodel.dart';
+import 'package:flutter_music_app/services/auth_service.dart';
 import 'package:flutter_music_app/views/auth/widgets/login_form.dart';
 import 'package:flutter_music_app/views/auth/widgets/register_form.dart';
 import 'package:get/get.dart';
@@ -16,7 +16,7 @@ class AuthView extends StatefulWidget {
 class _AuthViewState extends State<AuthView> {
   final _gestureRecognizer = TapGestureRecognizer();
   bool _isLogin = true; // true-登录页，false-注册页
-  final _authVM = Get.put(AuthViewmodel());
+  final _authVM = Get.find<AuthService>();
 
   void _handleCaptchaLogin(String phone, String captcha) {
     _authVM.captchaLogin(phone, captcha);
@@ -146,18 +146,6 @@ class _AuthViewState extends State<AuthView> {
                         onEmailLogin: _handleEmailLogin,
                       )
                     : RegisterForm(onRegister: _handleRegister),
-
-                GestureDetector(
-                  onTap: _handleGuestLogin,
-                  child: Text(
-                    '游客登录',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
                 RichText(
                   text: TextSpan(
                     children: [

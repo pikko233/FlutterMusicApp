@@ -1,12 +1,25 @@
 import 'package:flutter_music_app/constants/app_routes.dart';
 import 'package:flutter_music_app/repositories/auth_repository.dart';
-import 'package:flutter_music_app/utils/request.dart';
 import 'package:flutter_music_app/utils/user_storage.dart';
 import 'package:get/get.dart';
 
-class AuthViewmodel extends GetxController {
+class AuthService extends GetxController {
   final user = Rxn(); // 用户信息
   final isLoading = false.obs; // 是否加载中
+  final isLogin = false.obs; // 是否登录
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initState();
+  }
+
+  Future<void> _initState() async {
+    if (await UserStorage.getCookie() == null) {
+      // 未登录，先使用游客登录拿到cookie
+      await guestLogin();
+    }
+  }
 
   // 手机验证码登录
   Future<void> captchaLogin(String phone, String captcha) async {
@@ -57,7 +70,6 @@ class AuthViewmodel extends GetxController {
       final cookie = res['cookie'] as String;
       final userId = res['userId'] as int;
       await UserStorage.save(cookie: cookie, userId: userId, isGuest: true);
-      Request.setCookie(cookie);
       Get.offAllNamed(AppRoutes.main);
     } catch (e) {
       print(e);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
+import 'package:flutter_music_app/services/auth_service.dart';
 import 'package:flutter_music_app/utils/request.dart';
+import 'package:flutter_music_app/utils/user_storage.dart';
 import 'package:get/get.dart';
 
 class SplashView extends StatefulWidget {
@@ -20,7 +22,6 @@ class _SplashViewState extends State<SplashView> {
 
   Future<void> _jumpToMainView() async {
     await Future.delayed(const Duration(milliseconds: 2000));
-    await Request.init();
     Get.offAllNamed(AppRoutes.main);
   }
 

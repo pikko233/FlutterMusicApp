@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_music_app/constants/app_colors.dart';
 import 'package:flutter_music_app/constants/app_routes.dart';
-import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/services/player_service.dart';
 import 'package:flutter_music_app/utils/user_storage.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
-import 'package:flutter_music_app/widgets/recent_song_cell.dart';
 import 'package:flutter_music_app/widgets/search_playlist_cell.dart';
-import 'package:flutter_music_app/widgets/search_song_cell.dart';
 import 'package:flutter_music_app/widgets/section_title.dart';
 import 'package:get/get.dart';
 
@@ -19,11 +16,7 @@ class MyView extends StatefulWidget {
 }
 
 class _MyViewState extends State<MyView> {
-  bool _isGuest = true; // 是否为游客
-  bool _isLoggedIn = false; // 是否已登录
-
-  // 如果是已登录的用户，应该去调api，但是网易把我的号风控了，所以只做了游客登录……
-  List<SongModel> _recentSongs = []; // 最近播放歌曲-缓存中，游客的最近播放歌曲，
+  bool _isLoggedIn = false;
 
   final _player = Get.find<PlayerService>();
 
@@ -35,7 +28,6 @@ class _MyViewState extends State<MyView> {
 
   Future<void> _loadAuthState() async {
     _isLoggedIn = await UserStorage.isLoggedIn();
-    _isGuest = await UserStorage.isGuest();
     setState(() {});
   }
 
@@ -76,7 +68,7 @@ class _MyViewState extends State<MyView> {
                     color: AppColors.bgCard,
                     borderRadius: BorderRadius.circular(media.width * 0.15),
                   ),
-                  child: _isGuest
+                  child: !_isLoggedIn
                       ? Icon(
                           Icons.person,
                           size: media.width * 0.15,
@@ -94,7 +86,7 @@ class _MyViewState extends State<MyView> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  _isGuest ? "游客" : "pikko233",
+                  !_isLoggedIn ? "游客" : "pikko233",
                   style: TextStyle(
                     color: AppColors.textPrimary,
                     fontSize: 18,
@@ -103,7 +95,7 @@ class _MyViewState extends State<MyView> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  _isGuest ? "未登录账号" : "音乐爱好者 • Lv6",
+                  !_isLoggedIn ? "未登录账号" : "音乐爱好者 • Lv6",
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
@@ -111,7 +103,7 @@ class _MyViewState extends State<MyView> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                if (_isGuest) ...[
+                if (!_isLoggedIn) ...[
                   ElevatedButton(
                     onPressed: () => Get.toNamed(AppRoutes.auth),
                     style: ElevatedButton.styleFrom(

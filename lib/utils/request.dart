@@ -4,16 +4,6 @@ import 'package:flutter_music_app/utils/toast_util.dart';
 import 'package:flutter_music_app/utils/user_storage.dart';
 
 class Request {
-  static String? _cookie;
-
-  static Future<void> init() async {
-    _cookie = await UserStorage.getCookie();
-  }
-
-  static void setCookie(String cookie) {
-    _cookie = cookie;
-  }
-
   static final _dio =
       Dio(
           BaseOptions(
@@ -26,8 +16,9 @@ class Request {
         )
         ..interceptors.addAll([
           InterceptorsWrapper(
-            onRequest: (options, handler) {
-              if (_cookie != null) options.headers['Cookie'] = _cookie;
+            onRequest: (options, handler) async {
+              final cookie = await UserStorage.getCookie();
+              if (cookie != null) options.headers['Cookie'] = cookie;
               handler.next(options);
             },
             onResponse: (response, handler) {
@@ -46,6 +37,7 @@ class Request {
               handler.next(error);
             },
           ),
+          LogInterceptor(requestBody: true, responseBody: true),
         ]);
 
   static Future<Response> get(
@@ -69,13 +61,14 @@ class Request {
           ),
         )
         ..interceptors.addAll([
-          LogInterceptor(requestBody: true, responseBody: true),
           InterceptorsWrapper(
-            onRequest: (options, handler) {
-              if (_cookie != null) options.headers['Cookie'] = _cookie;
+            onRequest: (options, handler) async {
+              final cookie = await UserStorage.getCookie();
+              if (cookie != null) options.headers['Cookie'] = cookie;
               handler.next(options);
             },
           ),
+          LogInterceptor(requestBody: true, responseBody: true),
         ]);
 
   static Future<Response> getRaw(

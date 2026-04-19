@@ -28,14 +28,14 @@ class UserStorage {
     return prefs.getInt(_keyUserId);
   }
 
-  static Future<bool> isGuest() async {
+  static Future<bool> _isGuest() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyIsGuest) ?? false;
   }
 
   static Future<bool> isLoggedIn() async {
     final cookie = await getCookie();
-    return cookie != null && cookie.isNotEmpty;
+    return cookie != null && cookie.isNotEmpty && !await _isGuest();
   }
 
   static Future<void> clear() async {
