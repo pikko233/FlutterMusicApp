@@ -20,7 +20,7 @@ class SearchViewmodel extends GetxController {
     } catch (e) {
       print(e);
     } finally {
-      isLoading.value = true;
+      isLoading.value = false;
     }
   }
 

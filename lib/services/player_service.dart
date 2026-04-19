@@ -386,7 +386,7 @@ class PlayerService extends GetxController {
   // 从播放列表中移除
   void removeFromPlaylist(int songId) {
     final index = playlist.indexWhere((item) => item.id == songId);
-    if (index != -1) {
+    if (index == -1) {
       ToastUtil.showToast('播放列表中不存在这首歌');
       return;
     }
