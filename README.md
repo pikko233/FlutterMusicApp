@@ -6,14 +6,6 @@
 
 ## 已实现功能
 
-### 认证
-
-- 游客登录（匿名 cookie 模式）
-- 手机验证码登录（含倒计时 UI）
-- 邮箱密码登录（前端 MD5 加密）
-- 二维码扫码登录（轮询状态检查）
-- Cookie 持久化（登录状态保持）
-
 ### 音乐播放器
 
 - 播放 / 暂停 / 上下首切歌
@@ -65,9 +57,8 @@
 
 ### 个人主页 / 最近播放
 
-- 登录 / 游客状态展示
+- 游客登录
 - 最近播放歌曲列表
-- 用户统计信息（收藏数、关注数、粉丝数）
 
 ---
 
@@ -123,7 +114,7 @@
 git clone https://github.com/pikko233/NeteaseCloudMusicApi.git
 cd NeteaseCloudMusicApi
 npm install # 安装依赖
-node app.js
+node app.js # 启动服务
 ```
 
 2. 克隆客户端项目
