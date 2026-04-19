@@ -2,7 +2,7 @@
 
 ## 介绍
 
-基于 Flutter 开发的网易云音乐第三方客户端，对接 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)，使用 GetX 进行状态管理，采用 Service + Repository + ViewModel + View 分层架构。
+基于 Flutter 开发的网易云音乐第三方客户端，对接 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)，使用 GetX 进行状态管理，采用 MVVM 分层架构。
 
 ## 已实现功能
 
@@ -88,20 +88,22 @@
 
 ## 项目中用到的[第三方库](https://pub.dev)
 
-- [get](https://pub.dev/packages/get) 使用 GetX 进行状态管理
-- [intl](https://pub.dev/packages/intl) 格式化工具 - 用于千分位分隔符、日期时间格式化
-- [audio_video_progress_bar](https://pub.dev/packages/audio_video_progress_bar) 音频进度条 UI 库
-- [dio](https://pub.dev/packages/dio) 网络请求库
-- [cached_network_image](https://pub.dev/packages/cached_network_image) 将网络图片缓存至本地，防止刷新页面时重新发送请求获取图片，浪费资源
-- [marquee](https://pub.dev/packages/marquee) 文字跑马灯效果
-- [just_audio](https://pub.dev/packages/just_audio) 音频播放功能
-- [just_audio_background](https://pub.dev/packages/just_audio_background) 后台播放功能
-- [rxdart](https://pub.dev/packages/rxdart) 合并数据流，将音频的*播放进度*、*缓冲进度*以及*总时长*三个数据流合并成一个数据流
-- [carousel_slider](https://pub.dev/packages/carousel_slider) 实现左右滑动切换歌曲的轮播图效果
-- [flutter_lyric](https://pub.dev/packages/flutter_lyric) 实现歌词展示与滚动
-- [palette_generator_master](https://pub.dev/packages/palette_generator_master) 从图片中提取色调，用于背景氛围色渲染
-- [crypto](https://pub.dev/packages/crypto) MD5 加密，用于登录注册对密码进行加密处理
-- [shared_preferences](https://pub.dev/packages/shared_preferences) 持久化存储，用于存储登录成功后返回的 cookie 和用户信息，以及游客登录时的最近播放歌曲记录
+| 库 | 用途 |
+| --- | --- |
+| [get](https://pub.dev/packages/get) | 使用 GetX 进行状态管理 |
+| [intl](https://pub.dev/packages/intl) | 格式化工具 - 用于千分位分隔符、日期时间格式化 |
+| [audio_video_progress_bar](https://pub.dev/packages/audio_video_progress_bar) | 音频进度条 UI 库 |
+| [dio](https://pub.dev/packages/dio) | 网络请求库 |
+| [cached_network_image](https://pub.dev/packages/cached_network_image) | 将网络图片缓存至本地，防止刷新页面时重新发送请求获取图片，浪费资源 |
+| [marquee](https://pub.dev/packages/marquee) | 文字跑马灯效果 |
+| [just_audio](https://pub.dev/packages/just_audio) | 音频播放功能 |
+| [just_audio_background](https://pub.dev/packages/just_audio_background) | 后台播放功能 |
+| [rxdart](https://pub.dev/packages/rxdart) | 合并数据流，将音频的*播放进度*、*缓冲进度*以及*总时长*三个数据流合并成一个数据流 |
+| [carousel_slider](https://pub.dev/packages/carousel_slider) | 实现左右滑动切换歌曲的轮播图效果 |
+| [flutter_lyric](https://pub.dev/packages/flutter_lyric) | 实现歌词展示与滚动 |
+| [palette_generator_master](https://pub.dev/packages/palette_generator_master) | 从图片中提取色调，用于背景氛围色渲染 |
+| [crypto](https://pub.dev/packages/crypto) | MD5 加密，用于登录注册对密码进行加密处理 |
+| [shared_preferences](https://pub.dev/packages/shared_preferences) | 持久化存储，用于存储登录成功后返回的 cookie 和用户信息，以及游客登录时的最近播放歌曲记录 |
 
 ---
 
