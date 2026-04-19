@@ -7,6 +7,7 @@ import 'package:flutter_music_app/viewmodels/artist_detail_viewmodel.dart';
 import 'package:flutter_music_app/widgets/mini_player.dart';
 import 'package:flutter_music_app/widgets/netease_image.dart';
 import 'package:flutter_music_app/widgets/playlist_song_cell.dart';
+import 'package:flutter_music_app/widgets/similar_artist.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -17,16 +18,32 @@ class ArtistDetailView extends StatefulWidget {
   State<ArtistDetailView> createState() => _ArtistDetailViewState();
 }
 
-class _ArtistDetailViewState extends State<ArtistDetailView> {
+class _ArtistDetailViewState extends State<ArtistDetailView>
+    with SingleTickerProviderStateMixin {
   late ArtistDetailViewmodel _artistDetailVM;
   final _player = Get.find<PlayerService>();
+  bool _showSimilarArtist = false; // 是否显示相似歌手
+  late final AnimationController _rotationController;
 
   void initState() {
     super.initState();
 
+    final id = Get.arguments['id'] as int? ?? 0;
     _artistDetailVM = Get.put(
-      ArtistDetailViewmodel(id: Get.arguments['id'] ?? 0),
+      ArtistDetailViewmodel(id: id),
+      tag: id.toString(),
     );
+
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 200),
+    );
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,6 +68,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
               }
               final artist = _artistDetailVM.artist.value!;
               final topSongs = _artistDetailVM.topSongs;
+              final similarArtists = _artistDetailVM.similarArtists;
               return CustomScrollView(
                 slivers: [
                   SliverAppBar(
@@ -128,6 +146,7 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                               children: [
                                 ElevatedButton.icon(
                                   onPressed: () {
+                                    // TODO 关注歌手
                                     print('关注歌手');
                                   },
                                   label: Text(
@@ -151,8 +170,72 @@ class _ArtistDetailViewState extends State<ArtistDetailView> {
                                     visualDensity: VisualDensity.compact,
                                   ),
                                 ),
+                                if (similarArtists.isNotEmpty) ...[
+                                  const SizedBox(width: 10),
+                                  // 查看相似歌手
+                                  IconButton.filled(
+                                    onPressed: () {
+                                      setState(() {
+                                        _showSimilarArtist =
+                                            !_showSimilarArtist;
+                                        _showSimilarArtist
+                                            ? _rotationController.forward()
+                                            : _rotationController.reverse();
+                                      });
+                                    },
+                                    visualDensity: VisualDensity.compact,
+                                    icon: RotationTransition(
+                                      turns: Tween(
+                                        begin: 0.0,
+                                        end: 0.5,
+                                      ).animate(_rotationController),
+                                      child: Icon(
+                                        Icons.arrow_drop_down,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.black26,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
+                          ),
+                          // 相似歌手列表
+                          AnimatedSize(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            child: _showSimilarArtist
+                                ? SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    physics: BouncingScrollPhysics(),
+                                    child: Row(
+                                      spacing: 10,
+                                      children: List.generate(
+                                        similarArtists.length,
+                                        (index) {
+                                          final item = similarArtists[index];
+                                          return SimilarArtist(
+                                            artist: item,
+                                            onPressed: () {
+                                              print('点击跳转歌手详情页');
+                                              Get.toNamed(
+                                                AppRoutes.artistDetail,
+                                                arguments: {'id': item.id},
+                                                preventDuplicates: false,
+                                              );
+                                            },
+                                            toggleFollow: () {
+                                              // TODO 点击关注或取消关注
+                                              print('点击关注或取消关注');
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
                           ),
                         ],
                       ),

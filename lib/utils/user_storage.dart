@@ -20,7 +20,30 @@ class UserStorage {
 
   static Future<String?> getCookie() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_keyCookie);
+    final raw = prefs.getString(_keyCookie);
+    if (raw == null) return null;
+    return _parseCookieHeader(raw);
+  }
+
+  // 将 Set-Cookie 格式解析为 Cookie 请求头格式，过滤掉 Max-Age=0 的过期条目
+  static String _parseCookieHeader(String rawCookie) {
+    final parts = rawCookie.split(';;');
+    final cookieMap = <String, String>{};
+    for (final part in parts) {
+      final segments = part.split(';');
+      if (segments.isEmpty) continue;
+      final nameValue = segments[0].trim();
+      if (nameValue.isEmpty) continue;
+      final isExpired = segments.any(
+        (s) => s.trim().toLowerCase() == 'max-age=0',
+      );
+      if (isExpired) continue;
+      final eqIdx = nameValue.indexOf('=');
+      if (eqIdx == -1) continue;
+      final name = nameValue.substring(0, eqIdx).trim();
+      cookieMap[name] = nameValue;
+    }
+    return cookieMap.values.join('; ');
   }
 
   static Future<int?> getUserId() async {

@@ -29,4 +29,10 @@ class ArtistRepository {
     );
     return res.data;
   }
+
+  // 获取相似歌手
+  static Future<dynamic> getSimilarArtists(int id) async {
+    final res = await Request.get('/simi/artist', params: {'id': id});
+    return res.data['artists'];
+  }
 }

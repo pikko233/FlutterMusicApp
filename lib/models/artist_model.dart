@@ -12,6 +12,7 @@ class ArtistModel {
   final int musicSize; // 歌曲数
   final bool followed; // 是否关注
   final String? identityIconUrl; // 认证图标（可为null）
+  final int? fansCount; // 粉丝数
   ArtistModel({
     required this.id,
     required this.name,
@@ -21,6 +22,7 @@ class ArtistModel {
     required this.musicSize,
     required this.followed,
     this.identityIconUrl,
+    this.fansCount,
   });
 
   ArtistModel copyWith({
@@ -32,6 +34,7 @@ class ArtistModel {
     int? musicSize,
     bool? followed,
     String? identityIconUrl,
+    int? fansCount,
   }) {
     return ArtistModel(
       id: id ?? this.id,
@@ -42,6 +45,7 @@ class ArtistModel {
       musicSize: musicSize ?? this.musicSize,
       followed: followed ?? this.followed,
       identityIconUrl: identityIconUrl ?? this.identityIconUrl,
+      fansCount: fansCount ?? this.fansCount,
     );
   }
 
@@ -55,6 +59,7 @@ class ArtistModel {
       'musicSize': musicSize,
       'followed': followed,
       'identityIconUrl': identityIconUrl,
+      'fansCount': fansCount,
     };
   }
 
@@ -68,6 +73,7 @@ class ArtistModel {
       musicSize: map['musicSize'] as int,
       followed: map['followed'] as bool? ?? false,
       identityIconUrl: map['identityIconUrl'] as String?,
+      fansCount: map['fansCount'] as int?,
     );
   }
 
@@ -78,7 +84,7 @@ class ArtistModel {
 
   @override
   String toString() {
-    return 'ArtistModel(id: $id, name: $name, img1v1Url: $img1v1Url, alias: $alias, albumSize: $albumSize, musicSize: $musicSize, followed: $followed, identityIconUrl: $identityIconUrl)';
+    return 'ArtistModel(id: $id, name: $name, img1v1Url: $img1v1Url, alias: $alias, albumSize: $albumSize, musicSize: $musicSize, followed: $followed, identityIconUrl: $identityIconUrl, fansCount: $fansCount)';
   }
 
   @override
@@ -92,7 +98,8 @@ class ArtistModel {
         other.albumSize == albumSize &&
         other.musicSize == musicSize &&
         other.followed == followed &&
-        other.identityIconUrl == identityIconUrl;
+        other.identityIconUrl == identityIconUrl &&
+        other.fansCount == fansCount;
   }
 
   @override
@@ -104,6 +111,7 @@ class ArtistModel {
         albumSize.hashCode ^
         musicSize.hashCode ^
         followed.hashCode ^
-        identityIconUrl.hashCode;
+        identityIconUrl.hashCode ^
+        fansCount.hashCode;
   }
 }

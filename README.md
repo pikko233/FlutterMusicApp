@@ -39,3 +39,46 @@ CachedNetworkImage(
   },
 )
 ```
+
+---
+
+### 2026.04.19 — GetX 同路由跳转被静默拦截 & Get.put tag 机制
+
+**问题：** 在歌手详情页（`/artist_detail`）点击相似歌手，想再次跳转到 `/artist_detail`，但点击完全没有反应。
+
+**原因：** GetX 对"防止重复路由"有**两处独立**的拦截逻辑，必须同时处理：`GetPage(preventDuplicates: true)` 和 `Get.toNamed(..., preventDuplicates: true)`
+
+**解决方案：** 两处都需要设为 `false`。
+
+`my_app.dart` 中注册路由：
+
+```dart
+GetPage(
+  name: AppRoutes.artistDetail,
+  page: () => const ArtistDetailView(),
+  preventDuplicates: false, // 允许同路由叠加
+),
+```
+
+调用跳转时：
+
+```dart
+Get.toNamed(
+  AppRoutes.artistDetail,
+  arguments: {'id': item.id},
+  preventDuplicates: false, // 必须同时在调用处声明
+);
+```
+
+---
+
+**另外：** 同一路由（`/artist_detail`）有多个实例时需要用 `Get.put` 的 tag 区分 ViewModel
+
+```dart
+// ArtistDetailView 的 initState 中
+final id = Get.arguments['id'] as int? ?? 0;
+_artistDetailVM = Get.put(
+  ArtistDetailViewmodel(id: id),
+  tag: id.toString(), // 用 id 作为 tag，不同歌手互不干扰
+);
+```

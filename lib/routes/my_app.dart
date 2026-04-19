@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: AppRoutes.artistDetail,
           page: () => const ArtistDetailView(),
+          preventDuplicates: false,
         ),
         GetPage(
           name: AppRoutes.playerScreen,

@@ -1,4 +1,5 @@
 import 'package:flutter_music_app/models/artist_detail_model.dart';
+import 'package:flutter_music_app/models/artist_model.dart';
 import 'package:flutter_music_app/models/song_model.dart';
 import 'package:flutter_music_app/repositories/artist_repository.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ class ArtistDetailViewmodel extends GetxController {
   final artist = Rxn<ArtistDetailModel>(); // 歌手详情
   final isLoading = false.obs;
   final topSongs = <SongModel>[].obs; // 歌手热门歌曲50首
+  final similarArtists = <ArtistModel>[].obs; // 相似歌手
 
   @override
   void onInit() {
@@ -19,7 +21,11 @@ class ArtistDetailViewmodel extends GetxController {
   Future<void> _loadData() async {
     try {
       isLoading.value = true;
-      await Future.wait([_getArtistDetail(id), _getArtistTopSong(id)]);
+      await Future.wait([
+        _getArtistDetail(id),
+        _getArtistTopSong(id),
+        _getSimilarArtists(id),
+      ]);
     } catch (e) {
       print(e);
     } finally {
@@ -41,5 +47,14 @@ class ArtistDetailViewmodel extends GetxController {
     final res = await ArtistRepository.getArtistTopSong(id);
     topSongs.value = (res as List).map((e) => SongModel.fromMap(e)).toList();
     print('歌手热门歌曲50首, $topSongs');
+  }
+
+  // 获取相似歌手
+  // 需要cookie
+  Future<void> _getSimilarArtists(int id) async {
+    final res = await ArtistRepository.getSimilarArtists(id);
+    similarArtists.value = (res as List)
+        .map((e) => ArtistModel.fromMap(e))
+        .toList();
   }
 }

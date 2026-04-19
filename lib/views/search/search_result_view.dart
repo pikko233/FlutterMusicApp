@@ -140,6 +140,7 @@ class _SearchResultViewState extends State<SearchResultView>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.bgCard,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: Icon(Icons.arrow_back),
