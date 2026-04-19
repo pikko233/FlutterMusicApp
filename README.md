@@ -108,29 +108,48 @@
 
 ## 快速开始
 
-1. 克隆服务端项目 并启动网易云音乐 API 服务（默认端口 3000）
-
+1. 克隆服务端项目
 ```bash
 git clone https://github.com/pikko233/NeteaseCloudMusicApi.git
-cd NeteaseCloudMusicApi
-npm install # 安装依赖
-node app.js # 启动服务
 ```
 
-2. 克隆客户端项目
+2. 进入项目根目录
 
 ```bash
-git clone https://github.com/pikko233/FlutterMusicApp.git
-cd FlutterMusicApp
+cd NeteaseCloudMusicApi 
 ```
 
 3. 安装依赖
 
 ```bash
+npm install
+```
+
+4. 启动网易云音乐 API 服务（默认端口 3000）
+
+```bash
+node app.js
+```
+
+5. 克隆客户端项目
+
+```bash
+git clone https://github.com/pikko233/FlutterMusicApp.git
+```
+
+6. 进入项目根目录
+
+```bash
+cd FlutterMusicApp
+```
+
+7. 安装依赖
+
+```bash
 flutter pub get
 ```
 
-4. 运行项目
+8. 运行项目
 
 ```bash
 flutter run
