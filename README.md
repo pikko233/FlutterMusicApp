@@ -4,6 +4,24 @@
 
 基于 Flutter 开发的网易云音乐第三方客户端，对接 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)，使用 GetX 进行状态管理，采用 MVVM 分层架构。
 
+## 项目预览
+
+<div align="center">
+  <img src="preview/preview1.gif" width="22%" />
+  <img src="preview/preview2.gif" width="22%" />
+  <img src="preview/preview3.gif" width="22%" />
+  <img src="preview/preview4.gif" width="22%" />
+</div>
+
+<div align="center">
+  <img src="preview/preview5.gif" width="22%" />
+  <img src="preview/preview6.gif" width="22%" />
+  <img src="preview/preview7.gif" width="22%" />
+  <img src="preview/preview8.gif" width="22%" />
+</div>
+
+---
+
 ## 已实现功能
 
 ### 音乐播放器
