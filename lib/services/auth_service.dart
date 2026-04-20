@@ -11,7 +11,7 @@ class AuthService extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initState();
+    // _initState();
   }
 
   Future<void> _initState() async {

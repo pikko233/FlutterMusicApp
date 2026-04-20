@@ -17,10 +17,12 @@ class SimilarArtist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final media = MediaQuery.sizeOf(context);
     return InkWell(
       onTap: onPressed,
       child: Container(
         padding: const EdgeInsets.all(15),
+        width: media.width * 0.26,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.black26,
@@ -33,6 +35,8 @@ class SimilarArtist extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               artist.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.textPrimary80,
                 fontSize: 12,
@@ -42,9 +46,11 @@ class SimilarArtist extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               '${CountUtil.formatCount(artist.fansCount!)} 粉丝',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             ElevatedButton.icon(
               onPressed: toggleFollow,
               label: Text(

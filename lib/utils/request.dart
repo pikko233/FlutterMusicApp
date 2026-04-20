@@ -17,8 +17,10 @@ class Request {
         ..interceptors.addAll([
           InterceptorsWrapper(
             onRequest: (options, handler) async {
+              // 游客登录后请求头带上cookie反而有些歌曲听不了，返回结果提示无版权，网易在搞什么鬼:(
+              // 一堆get请求里，只有获取相似歌手api是要cookie的
               final cookie = await UserStorage.getCookie();
-              if (cookie != null) options.headers['Cookie'] = cookie;
+              if (cookie != null && options.path == '/simi/artist') options.headers['Cookie'] = cookie;
               handler.next(options);
             },
             onResponse: (response, handler) {
@@ -37,7 +39,7 @@ class Request {
               handler.next(error);
             },
           ),
-          LogInterceptor(requestBody: true, responseBody: true),
+          // LogInterceptor(requestBody: true, responseBody: true),
         ]);
 
   static Future<Response> get(
@@ -63,12 +65,12 @@ class Request {
         ..interceptors.addAll([
           InterceptorsWrapper(
             onRequest: (options, handler) async {
-              final cookie = await UserStorage.getCookie();
-              if (cookie != null) options.headers['Cookie'] = cookie;
+              // final cookie = await UserStorage.getCookie();
+              // if (cookie != null) options.headers['Cookie'] = cookie;
               handler.next(options);
             },
           ),
-          LogInterceptor(requestBody: true, responseBody: true),
+          // LogInterceptor(requestBody: true, responseBody: true),
         ]);
 
   static Future<Response> getRaw(
